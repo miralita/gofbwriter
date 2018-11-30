@@ -1,11 +1,23 @@
 package go_fbwriter_test
 
 import (
-	"go-fbwriter"
+	"github.com/miralita/go-fbwriter"
+	"strings"
 	"testing"
 )
 
 func TestInit(t *testing.T) {
 	book := go_fbwriter.NewBook()
 	t.Log(book)
+
+	var b strings.Builder
+	b.WriteString("test\n")
+	addToBuilder(&b, "value1\n")
+	addToBuilder(&b, "value1\n")
+	b.WriteString("test")
+	t.Log(b.String())
+}
+
+func addToBuilder(b *strings.Builder, value string) {
+	b.WriteString(value)
 }

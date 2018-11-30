@@ -51,16 +51,51 @@ func (s *titleInfo) AddAuthor(firstName, middleName, lastName string) *author {
 }
 
 func (s *titleInfo) ToXml() (string, error) {
-	if s.genres == nil || len(s.genres) == 0 {
-		return "", makeError(ERR_EMPTY_FIELD, "Empty required field title-info/genre")
-	}
 	var b strings.Builder
 	b.WriteString("<title-info>\n")
-	for _, g := range s.genres {
-		b.WriteString(makeTag("genre", g.ToString()))
+	if err := s.serializeGenres(&b); err != nil {
+		return "", err
 	}
+	if err := s.serializeAuthors(&b); err != nil {
+		return "", err
+	}
+	if err := s.serializeBookTitle(&b); err != nil {
+		return "", err
+	}
+
 	b.WriteString("</title-info>")
 	return b.String(), nil
 }
 
+func (s *titleInfo) serializeGenres(b *strings.Builder) error {
+	if s.genres == nil || len(s.genres) == 0 {
+		return makeError(ERR_EMPTY_FIELD, "Empty required field title-info/genre")
+	}
+	for _, g := range s.genres {
+		b.WriteString(makeTag("genre", g.ToString()))
+	}
+	return nil
+}
 
+func (s *titleInfo) serializeAuthors(b *strings.Builder) error {
+	if s.authors == nil || len(s.authors) == 0 {
+		return makeError(ERR_EMPTY_FIELD, "Empty required field title-info/author")
+	}
+
+	for _, a := range s.authors {
+		xml, err := a.ToXml()
+		if err != nil {
+			return wrapError(err, ERR_NESTED_ENTITY, "Can't make title-info/author")
+		}
+		b.WriteString(xml)
+	}
+	return nil
+}
+
+func (s *titleInfo) serializeBookTitle(b *strings.Builder) error {
+	if s.bookTitle == "" {
+		return makeError(ERR_EMPTY_FIELD, "Empty required field title-info/book-title")
+	}
+	b.WriteString(makeTag("book-title", s.bookTitle))
+	return nil
+}

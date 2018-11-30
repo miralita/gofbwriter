@@ -11,6 +11,7 @@ type errorCode int
 const (
 	ERR_EMPTY_FIRST_NAME errorCode = iota
 	ERR_EMPTY_FIELD
+	ERR_NESTED_ENTITY
 	ERR_SYSTEM
 )
 

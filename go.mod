@@ -1,1 +1,1 @@
-module go-fbwriter
+module github.com/miralita/go-fbwriter
