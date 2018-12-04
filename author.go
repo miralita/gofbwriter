@@ -1,16 +1,16 @@
-package go_fbwriter
+package gofbwriter
 
 import "strings"
 
 type author struct {
-	firstName string
+	firstName  string
 	middleName []string
-	lastName string
-	nickname []string
-	homePage []string
-	email []string
-	id []string
-	book *book
+	lastName   string
+	nickname   []string
+	homePage   []string
+	email      []string
+	id         []string
+	book       *book
 }
 
 func (s *author) Email() []string {
@@ -77,11 +77,11 @@ func (s *author) AddHomepage(name string) {
 	}
 }
 
-func (s *author) ToXml() (string, error) {
+func (s *author) ToXML() (string, error) {
 	if s.firstName != "" && s.lastName == "" {
-		return "", makeError(ERR_EMPTY_FIRST_NAME, "Empty required field: author/first-name")
+		return "", makeError(ErrEmptyFirstName, "Empty required field: author/first-name")
 	} else if s.firstName == "" && s.lastName == "" {
-		return "", makeError(ERR_EMPTY_FIELD, "Empty required field: author/nickname")
+		return "", makeError(ErrEmptyField, "Empty required field: author/nickname")
 	}
 	var b strings.Builder
 	b.WriteString("<author>\n")

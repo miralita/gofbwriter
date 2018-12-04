@@ -1,4 +1,4 @@
-package go_fbwriter
+package gofbwriter
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 
 type stylesheet struct {
 	ctype string
-	data string
-	book *book
+	data  string
+	book  *book
 }
 
 func (s *stylesheet) Set(ctype, data string) {
@@ -16,7 +16,7 @@ func (s *stylesheet) Set(ctype, data string) {
 	s.data = data
 }
 
-func (s *stylesheet) ToXml() (string, error) {
+func (s *stylesheet) ToXML() (string, error) {
 	var b strings.Builder
 	b.WriteString("<stylesheet")
 	if s.ctype != "" {

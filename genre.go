@@ -1,199 +1,397 @@
-package go_fbwriter
+package gofbwriter
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
+//Genre - book genre from xsd
 type Genre int
 
 //go:generate stringer -type=Genre
 
 const (
-	GENRE_ACCOUNTING Genre = iota
-	GENRE_ADV_ANIMAL
-	GENRE_ADV_GEO
-	GENRE_ADV_HISTORY
-	GENRE_ADV_MARITIME
-	GENRE_ADV_WESTERN
-	GENRE_ADVENTURE
-	GENRE_ANTIQUE
-	GENRE_ANTIQUE_ANT
-	GENRE_ANTIQUE_EAST
-	GENRE_ANTIQUE_EUROPEAN
-	GENRE_ANTIQUE_MYTHS
-	GENRE_ANTIQUE_RUSSIAN
-	GENRE_APHORISM_QUOTE
-	GENRE_ARCHITECTURE_BOOK
-	GENRE_AUTO_REGULATIONS
-	GENRE_BANKING
-	GENRE_CHILD_ADV
-	GENRE_CHILD_DET
-	GENRE_CHILD_EDUCATION
-	GENRE_CHILD_PROSE
-	GENRE_CHILD_SF
-	GENRE_CHILD_TALE
-	GENRE_CHILD_VERSE
-	GENRE_CHILDREN
-	GENRE_CINEMA_THEATRE
-	GENRE_CITY_FANTASY
-	GENRE_COMP_DB
-	GENRE_COMP_HARD
-	GENRE_COMP_OSNET
-	GENRE_COMP_PROGRAMMING
-	GENRE_COMP_SOFT
-	GENRE_COMP_WWW
-	GENRE_COMPUTERS
-	GENRE_DESIGN
-	GENRE_DET_ACTION
-	GENRE_DET_CLASSIC
-	GENRE_DET_CRIME
-	GENRE_DET_ESPIONAGE
-	GENRE_DET_HARD
-	GENRE_DET_HISTORY
-	GENRE_DET_IRONY
-	GENRE_DET_POLICE
-	GENRE_DET_POLITICAL
-	GENRE_DETECTIVE
-	GENRE_DRAGON_FANTASY
-	GENRE_DRAMATURGY
-	GENRE_ECONOMICS
-	GENRE_ESSAYS
-	GENRE_FANTASY_FIGHT
-	GENRE_FOREIGN_ACTION
-	GENRE_FOREIGN_ADVENTURE
-	GENRE_FOREIGN_ANTIQUE
-	GENRE_FOREIGN_BUSINESS
-	GENRE_FOREIGN_CHILDREN
-	GENRE_FOREIGN_COMP
-	GENRE_FOREIGN_CONTEMPORARY
-	GENRE_FOREIGN_CONTEMPORARY_LIT
-	GENRE_FOREIGN_DESC
-	GENRE_FOREIGN_DETECTIVE
-	GENRE_FOREIGN_DRAMATURGY
-	GENRE_FOREIGN_EDU
-	GENRE_FOREIGN_FANTASY
-	GENRE_FOREIGN_HOME
-	GENRE_FOREIGN_HUMOR
-	GENRE_FOREIGN_LANGUAGE
-	GENRE_FOREIGN_LOVE
-	GENRE_FOREIGN_NOVEL
-	GENRE_FOREIGN_OTHER
-	GENRE_FOREIGN_POETRY
-	GENRE_FOREIGN_PROSE
-	GENRE_FOREIGN_PSYCHOLOGY
-	GENRE_FOREIGN_PUBLICISM
-	GENRE_FOREIGN_RELIGION
-	GENRE_FOREIGN_SF
-	GENRE_GEO_GUIDES
-	GENRE_GEOGRAPHY_BOOK
-	GENRE_GLOBAL_ECONOMY
-	GENRE_HISTORICAL_FANTASY
-	GENRE_HOME
-	GENRE_HOME_COOKING
-	GENRE_HOME_CRAFTS
-	GENRE_HOME_DIY
-	GENRE_HOME_ENTERTAIN
-	GENRE_HOME_GARDEN
-	GENRE_HOME_HEALTH
-	GENRE_HOME_PETS
-	GENRE_HOME_SEX
-	GENRE_HOME_SPORT
-	GENRE_HUMOR
-	GENRE_HUMOR_ANECDOTE
-	GENRE_HUMOR_FANTASY
-	GENRE_HUMOR_PROSE
-	GENRE_HUMOR_VERSE
-	GENRE_INDUSTRIES
-	GENRE_JOB_HUNTING
-	GENRE_LITERATURE_18
-	GENRE_LITERATURE_19
-	GENRE_LITERATURE_20
-	GENRE_LOVE_CONTEMPORARY
-	GENRE_LOVE_DETECTIVE
-	GENRE_LOVE_EROTICA
-	GENRE_LOVE_FANTASY
-	GENRE_LOVE_HISTORY
-	GENRE_LOVE_SF
-	GENRE_LOVE_SHORT
-	GENRE_MAGICIAN_BOOK
-	GENRE_MANAGEMENT
-	GENRE_MARKETING
-	GENRE_MILITARY_SPECIAL
-	GENRE_MUSIC_DANCING
-	GENRE_NARRATIVE
-	GENRE_NEWSPAPERS
-	GENRE_NONF_BIOGRAPHY
-	GENRE_NONF_CRITICISM
-	GENRE_NONF_PUBLICISM
-	GENRE_NONFICTION
-	GENRE_ORG_BEHAVIOR
-	GENRE_PAPER_WORK
-	GENRE_PEDAGOGY_BOOK
-	GENRE_PERIODIC
-	GENRE_PERSONAL_FINANCE
-	GENRE_POETRY
-	GENRE_POPADANEC
-	GENRE_POPULAR_BUSINESS
-	GENRE_PROSE_CLASSIC
-	GENRE_PROSE_COUNTER
-	GENRE_PROSE_HISTORY
-	GENRE_PROSE_MILITARY
-	GENRE_PROSE_RUS_CLASSIC
-	GENRE_PROSE_SU_CLASSICS
-	GENRE_PSY_ALASSIC
-	GENRE_PSY_CHILDS
-	GENRE_PSY_GENERIC
-	GENRE_PSY_PERSONAL
-	GENRE_PSY_SEX_AND_FAMILY
-	GENRE_PSY_SOCIAL
-	GENRE_PSY_THERAPHY
-	GENRE_REAL_ESTATE
-	GENRE_REF_DICT
-	GENRE_REF_ENCYC
-	GENRE_REF_GUIDE
-	GENRE_REF_REF
-	GENRE_REFERENCE
-	GENRE_RELIGION
-	GENRE_RELIGION_ESOTERICS
-	GENRE_RELIGION_REL
-	GENRE_RELIGION_SELF
-	GENRE_RUSSIAN_CONTEMPORARY
-	GENRE_RUSSIAN_FANTASY
-	GENRE_SCI_BIOLOGY
-	GENRE_SCI_CHEM
-	GENRE_SCI_CULTURE
-	GENRE_SCI_HISTORY
-	GENRE_SCI_JURIS
-	GENRE_SCI_LINGUISTIC
-	GENRE_SCI_MATH
-	GENRE_SCI_MEDICINE
-	GENRE_SCI_PHILOSOPHY
-	GENRE_SCI_PHYS
-	GENRE_SCI_POLITICS
-	GENRE_SCI_RELIGION
-	GENRE_SCI_TECH
-	GENRE_SCIENCE
-	GENRE_SF
-	GENRE_SF_ACTION
-	GENRE_SF_CYBERPUNK
-	GENRE_SF_DETECTIVE
-	GENRE_SF_FANTASY
-	GENRE_SF_HEROIC
-	GENRE_SF_HISTORY
-	GENRE_SF_HORROR
-	GENRE_SF_HUMOR
-	GENRE_SF_SOCIAL
-	GENRE_SF_SPACE
-	GENRE_SHORT_STORY
-	GENRE_SKETCH
-	GENRE_SMALL_BUSINESS
-	GENRE_SOCIOLOGY_BOOK
-	GENRE_STOCK
-	GENRE_THRILLER
-	GENRE_UPBRINGING_BOOK
-	GENRE_VAMPIRE_BOOK
-	GENRE_VISUAL_ARTS
-	GENRE_UNRECOGNISED
+	//GenreAccounting genre
+	GenreAccounting Genre = iota
+	//GenreAdvAnimal genre
+	GenreAdvAnimal
+	//GenreAdvGeo genre
+	GenreAdvGeo
+	//GenreAdvHistory genre
+	GenreAdvHistory
+	//GenreAdvMaritime genre
+	GenreAdvMaritime
+	//GenreAdvWestern genre
+	GenreAdvWestern
+	//GenreAdventure genre
+	GenreAdventure
+	//GenreAntique genre
+	GenreAntique
+	//GenreAntiqueAnt genre
+	GenreAntiqueAnt
+	//GenreAntiqueEast genre
+	GenreAntiqueEast
+	//GenreAntiqueEuropean genre
+	GenreAntiqueEuropean
+	//GenreAntiqueMyths genre
+	GenreAntiqueMyths
+	//GenreAntiqueRussian genre
+	GenreAntiqueRussian
+	//GenreAphorismQuote genre
+	GenreAphorismQuote
+	//GenreArchitectureBook genre
+	GenreArchitectureBook
+	//GenreAutoRegulations genre
+	GenreAutoRegulations
+	//GenreBanking genre
+	GenreBanking
+	//GenreChildAdv genre
+	GenreChildAdv
+	//GenreChildDet genre
+	GenreChildDet
+	//GenreChildEducation genre
+	GenreChildEducation
+	//GenreChildProse genre
+	GenreChildProse
+	//GenreChildSf genre
+	GenreChildSf
+	//GenreChildTale genre
+	GenreChildTale
+	//GenreChildVerse genre
+	GenreChildVerse
+	//GenreChildren genre
+	GenreChildren
+	//GenreCinemaTheatre genre
+	GenreCinemaTheatre
+	//GenreCityFantasy genre
+	GenreCityFantasy
+	//GenreCompDb genre
+	GenreCompDb
+	//GenreCompHard genre
+	GenreCompHard
+	//GenreCompOsnet genre
+	GenreCompOsnet
+	//GenreCompProgramming genre
+	GenreCompProgramming
+	//GenreCompSoft genre
+	GenreCompSoft
+	//GenreCompWww genre
+	GenreCompWww
+	//GenreComputers genre
+	GenreComputers
+	//GenreDesign genre
+	GenreDesign
+	//GenreDetAction genre
+	GenreDetAction
+	//GenreDetClassic genre
+	GenreDetClassic
+	//GenreDetCrime genre
+	GenreDetCrime
+	//GenreDetEspionage genre
+	GenreDetEspionage
+	//GenreDetHard genre
+	GenreDetHard
+	//GenreDetHistory genre
+	GenreDetHistory
+	//GenreDetIrony genre
+	GenreDetIrony
+	//GenreDetPolice genre
+	GenreDetPolice
+	//GenreDetPolitical genre
+	GenreDetPolitical
+	//GenreDetective genre
+	GenreDetective
+	//GenreDragonFantasy genre
+	GenreDragonFantasy
+	//GenreDramaturgy genre
+	GenreDramaturgy
+	//GenreEconomics genre
+	GenreEconomics
+	//GenreEssays genre
+	GenreEssays
+	//GenreFantasyFight genre
+	GenreFantasyFight
+	//GenreForeignAction genre
+	GenreForeignAction
+	//GenreForeignAdventure genre
+	GenreForeignAdventure
+	//GenreForeignAntique genre
+	GenreForeignAntique
+	//GenreForeignBusiness genre
+	GenreForeignBusiness
+	//GenreForeignChildren genre
+	GenreForeignChildren
+	//GenreForeignComp genre
+	GenreForeignComp
+	//GenreForeignContemporary genre
+	GenreForeignContemporary
+	//GenreForeignContemporaryLit genre
+	GenreForeignContemporaryLit
+	//GenreForeignDesc genre
+	GenreForeignDesc
+	//GenreForeignDetective genre
+	GenreForeignDetective
+	//GenreForeignDramaturgy genre
+	GenreForeignDramaturgy
+	//GenreForeignEdu genre
+	GenreForeignEdu
+	//GenreForeignFantasy genre
+	GenreForeignFantasy
+	//GenreForeignHome genre
+	GenreForeignHome
+	//GenreForeignHumor genre
+	GenreForeignHumor
+	//GenreForeignLanguage genre
+	GenreForeignLanguage
+	//GenreForeignLove genre
+	GenreForeignLove
+	//GenreForeignNovel genre
+	GenreForeignNovel
+	//GenreForeignOther genre
+	GenreForeignOther
+	//GenreForeignPoetry genre
+	GenreForeignPoetry
+	//GenreForeignProse genre
+	GenreForeignProse
+	//GenreForeignPsychology genre
+	GenreForeignPsychology
+	//GenreForeignPublicism genre
+	GenreForeignPublicism
+	//GenreForeignReligion genre
+	GenreForeignReligion
+	//GenreForeignSf genre
+	GenreForeignSf
+	//GenreGeoGuides genre
+	GenreGeoGuides
+	//GenreGeographyBook genre
+	GenreGeographyBook
+	//GenreGlobalEconomy genre
+	GenreGlobalEconomy
+	//GenreHistoricalFantasy genre
+	GenreHistoricalFantasy
+	//GenreHome genre
+	GenreHome
+	//GenreHomeCooking genre
+	GenreHomeCooking
+	//GenreHomeCrafts genre
+	GenreHomeCrafts
+	//GenreHomeDiy genre
+	GenreHomeDiy
+	//GenreHomeEntertain genre
+	GenreHomeEntertain
+	//GenreHomeGarden genre
+	GenreHomeGarden
+	//GenreHomeHealth genre
+	GenreHomeHealth
+	//GenreHomePets genre
+	GenreHomePets
+	//GenreHomeSex genre
+	GenreHomeSex
+	//GenreHomeSport genre
+	GenreHomeSport
+	//GenreHumor genre
+	GenreHumor
+	//GenreHumorAnecdote genre
+	GenreHumorAnecdote
+	//GenreHumorFantasy genre
+	GenreHumorFantasy
+	//GenreHumorProse genre
+	GenreHumorProse
+	//GenreHumorVerse genre
+	GenreHumorVerse
+	//GenreIndustries genre
+	GenreIndustries
+	//GenreJobHunting genre
+	GenreJobHunting
+	//GenreLiterature18 genre
+	GenreLiterature18
+	//GenreLiterature19 genre
+	GenreLiterature19
+	//GenreLiterature20 genre
+	GenreLiterature20
+	//GenreLoveContemporary genre
+	GenreLoveContemporary
+	//GenreLoveDetective genre
+	GenreLoveDetective
+	//GenreLoveErotica genre
+	GenreLoveErotica
+	//GenreLoveFantasy genre
+	GenreLoveFantasy
+	//GenreLoveHistory genre
+	GenreLoveHistory
+	//GenreLoveSf genre
+	GenreLoveSf
+	//GenreLoveShort genre
+	GenreLoveShort
+	//GenreMagicianBook genre
+	GenreMagicianBook
+	//GenreManagement genre
+	GenreManagement
+	//GenreMarketing genre
+	GenreMarketing
+	//GenreMilitarySpecial genre
+	GenreMilitarySpecial
+	//GenreMusicDancing genre
+	GenreMusicDancing
+	//GenreNarrative genre
+	GenreNarrative
+	//GenreNewspapers genre
+	GenreNewspapers
+	//GenreNonfBiography genre
+	GenreNonfBiography
+	//GenreNonfCriticism genre
+	GenreNonfCriticism
+	//GenreNonfPublicism genre
+	GenreNonfPublicism
+	//GenreNonfiction genre
+	GenreNonfiction
+	//GenreOrgBehavior genre
+	GenreOrgBehavior
+	//GenrePaperWork genre
+	GenrePaperWork
+	//GenrePedagogyBook genre
+	GenrePedagogyBook
+	//GenrePeriodic genre
+	GenrePeriodic
+	//GenrePersonalFinance genre
+	GenrePersonalFinance
+	//GenrePoetry genre
+	GenrePoetry
+	//GenrePopadanec genre
+	GenrePopadanec
+	//GenrePopularBusiness genre
+	GenrePopularBusiness
+	//GenreProseClassic genre
+	GenreProseClassic
+	//GenreProseCounter genre
+	GenreProseCounter
+	//GenreProseHistory genre
+	GenreProseHistory
+	//GenreProseMilitary genre
+	GenreProseMilitary
+	//GenreProseRusClassic genre
+	GenreProseRusClassic
+	//GenreProseSuClassics genre
+	GenreProseSuClassics
+	//GenrePsyAlassic genre
+	GenrePsyAlassic
+	//GenrePsyChilds genre
+	GenrePsyChilds
+	//GenrePsyGeneric genre
+	GenrePsyGeneric
+	//GenrePsyPersonal genre
+	GenrePsyPersonal
+	//GenrePsySexAndFamily genre
+	GenrePsySexAndFamily
+	//GenrePsySocial genre
+	GenrePsySocial
+	//GenrePsyTheraphy genre
+	GenrePsyTheraphy
+	//GenreRealEstate genre
+	GenreRealEstate
+	//GenreRefDict genre
+	GenreRefDict
+	//GenreRefEncyc genre
+	GenreRefEncyc
+	//GenreRefGuide genre
+	GenreRefGuide
+	//GenreRefRef genre
+	GenreRefRef
+	//GenreReference genre
+	GenreReference
+	//GenreReligion genre
+	GenreReligion
+	//GenreReligionEsoterics genre
+	GenreReligionEsoterics
+	//GenreReligionRel genre
+	GenreReligionRel
+	//GenreReligionSelf genre
+	GenreReligionSelf
+	//GenreRussianContemporary genre
+	GenreRussianContemporary
+	//GenreRussianFantasy genre
+	GenreRussianFantasy
+	//GenreSciBiology genre
+	GenreSciBiology
+	//GenreSciChem genre
+	GenreSciChem
+	//GenreSciCulture genre
+	GenreSciCulture
+	//GenreSciHistory genre
+	GenreSciHistory
+	//GenreSciJuris genre
+	GenreSciJuris
+	//GenreSciLinguistic genre
+	GenreSciLinguistic
+	//GenreSciMath genre
+	GenreSciMath
+	//GenreSciMedicine genre
+	GenreSciMedicine
+	//GenreSciPhilosophy genre
+	GenreSciPhilosophy
+	//GenreSciPhys genre
+	GenreSciPhys
+	//GenreSciPolitics genre
+	GenreSciPolitics
+	//GenreSciReligion genre
+	GenreSciReligion
+	//GenreSciTech genre
+	GenreSciTech
+	//GenreScience genre
+	GenreScience
+	//GenreSf genre
+	GenreSf
+	//GenreSfAction genre
+	GenreSfAction
+	//GenreSfCyberpunk genre
+	GenreSfCyberpunk
+	//GenreSfDetective genre
+	GenreSfDetective
+	//GenreSfFantasy genre
+	GenreSfFantasy
+	//GenreSfHeroic genre
+	GenreSfHeroic
+	//GenreSfHistory genre
+	GenreSfHistory
+	//GenreSfHorror genre
+	GenreSfHorror
+	//GenreSfHumor genre
+	GenreSfHumor
+	//GenreSfSocial genre
+	GenreSfSocial
+	//GenreSfSpace genre
+	GenreSfSpace
+	//GenreShortStory genre
+	GenreShortStory
+	//GenreSketch genre
+	GenreSketch
+	//GenreSmallBusiness genre
+	GenreSmallBusiness
+	//GenreSociologyBook genre
+	GenreSociologyBook
+	//GenreStock genre
+	GenreStock
+	//GenreThriller genre
+	GenreThriller
+	//GenreUpbringingBook genre
+	GenreUpbringingBook
+	//GenreVampireBook genre
+	GenreVampireBook
+	//GenreVisualArts genre
+	GenreVisualArts
+	//GenreUnrecognised genre
+	GenreUnrecognised
 )
 
-func (s Genre) ToString() string {
-	return strings.ToLower(strings.TrimPrefix(s.String(), "GENRE_"))
+var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+
+func toSnakeCase(str string) string {
+	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
+	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+	return strings.ToLower(snake)
+}
+
+func (s Genre) toString() string {
+	return toSnakeCase(strings.TrimPrefix(s.String(), "Genre"))
 }

@@ -1,12 +1,12 @@
-package go_fbwriter
+package gofbwriter
 
 import "strings"
 
 type titleInfo struct {
-	genres []Genre
-	authors []*author
+	genres    []Genre
+	authors   []*author
 	bookTitle string
-	book *book
+	book      *book
 }
 
 func (s *titleInfo) BookTitle() string {
@@ -38,10 +38,10 @@ func (s *titleInfo) Authors() []*author {
 
 func (s *titleInfo) AddAuthor(firstName, middleName, lastName string) *author {
 	author := &author{
-		firstName: firstName,
+		firstName:  firstName,
 		middleName: []string{},
-		lastName: lastName,
-		book: s.book,
+		lastName:   lastName,
+		book:       s.book,
 	}
 	if middleName != "" {
 		author.middleName = []string{middleName}
@@ -50,7 +50,7 @@ func (s *titleInfo) AddAuthor(firstName, middleName, lastName string) *author {
 	return author
 }
 
-func (s *titleInfo) ToXml() (string, error) {
+func (s *titleInfo) ToXML() (string, error) {
 	var b strings.Builder
 	b.WriteString("<title-info>\n")
 	if err := s.serializeGenres(&b); err != nil {
@@ -69,23 +69,23 @@ func (s *titleInfo) ToXml() (string, error) {
 
 func (s *titleInfo) serializeGenres(b *strings.Builder) error {
 	if s.genres == nil || len(s.genres) == 0 {
-		return makeError(ERR_EMPTY_FIELD, "Empty required field title-info/genre")
+		return makeError(ErrEmptyField, "Empty required field title-info/genre")
 	}
 	for _, g := range s.genres {
-		b.WriteString(makeTag("genre", g.ToString()))
+		b.WriteString(makeTag("genre", g.toString()))
 	}
 	return nil
 }
 
 func (s *titleInfo) serializeAuthors(b *strings.Builder) error {
 	if s.authors == nil || len(s.authors) == 0 {
-		return makeError(ERR_EMPTY_FIELD, "Empty required field title-info/author")
+		return makeError(ErrEmptyField, "Empty required field title-info/author")
 	}
 
 	for _, a := range s.authors {
-		xml, err := a.ToXml()
+		xml, err := a.ToXML()
 		if err != nil {
-			return wrapError(err, ERR_NESTED_ENTITY, "Can't make title-info/author")
+			return wrapError(err, ErrNestedEntity, "Can't make title-info/author")
 		}
 		b.WriteString(xml)
 	}
@@ -94,7 +94,7 @@ func (s *titleInfo) serializeAuthors(b *strings.Builder) error {
 
 func (s *titleInfo) serializeBookTitle(b *strings.Builder) error {
 	if s.bookTitle == "" {
-		return makeError(ERR_EMPTY_FIELD, "Empty required field title-info/book-title")
+		return makeError(ErrEmptyField, "Empty required field title-info/book-title")
 	}
 	b.WriteString(makeTag("book-title", s.bookTitle))
 	return nil

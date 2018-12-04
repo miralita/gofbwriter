@@ -1,7 +1,7 @@
-package go_fbwriter
+package gofbwriter
 
-type fbwriter interface {
-	ToXml() (string, error)
+type fb interface {
+	ToXML() (string, error)
 }
 
 type body struct {
@@ -9,10 +9,19 @@ type body struct {
 }
 
 type binary struct {
-	Id string
+	ID          string
 	ContentType string
-	Data []byte
+	Data        []byte
 }
 
+type itype int
 
+const (
+	itypeP itype = iota
+	itypeEmpty
+)
 
+type item struct {
+	itype     itype
+	itemValue fb
+}

@@ -1,8 +1,8 @@
-package go_fbwriter
+package gofbwriter
 
 type description struct {
 	titleInfo *titleInfo
-	book *book
+	book      *book
 }
 
 func (s *description) TitleInfo() *titleInfo {

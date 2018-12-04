@@ -1,4 +1,4 @@
-package go_fbwriter
+package gofbwriter
 
 import (
 	"fmt"
@@ -6,21 +6,26 @@ import (
 )
 
 type errorCode int
+
 //go:generate stringer -type=errorCode
 
 const (
-	ERR_EMPTY_FIRST_NAME errorCode = iota
-	ERR_EMPTY_FIELD
-	ERR_NESTED_ENTITY
-	ERR_SYSTEM
+	//ErrEmptyFirstName - empty required first name
+	ErrEmptyFirstName errorCode = iota
+	//ErrEmptyField - empty required field
+	ErrEmptyField
+	//ErrNestedEntity - empty required nested entity
+	ErrNestedEntity
+	//ErrSystem - system error
+	ErrSystem
 )
 
 type errorf struct {
-	etype errorCode
-	message string
+	etype    errorCode
+	message  string
 	funcName string
 	fileLine int
-	next *errorf
+	next     *errorf
 }
 
 func makeError(code errorCode, message string) error {
@@ -37,21 +42,21 @@ func makeError(code errorCode, message string) error {
 func wrapError(err error, code errorCode, message string) error {
 	e, ok := err.(*errorf)
 	if !ok {
-		e = &errorf{etype: ERR_SYSTEM, message: err.Error()}
+		e = &errorf{etype: ErrSystem, message: err.Error()}
 	}
-	new_err := &errorf{etype: code, message: message, next: e}
+	newErr := &errorf{etype: code, message: message, next: e}
 	pc, _, _, ok := runtime.Caller(1)
 	details := runtime.FuncForPC(pc)
 	if ok && details != nil {
-		new_err.funcName = details.Name()
-		_, new_err.fileLine = details.FileLine(pc)
+		newErr.funcName = details.Name()
+		_, newErr.fileLine = details.FileLine(pc)
 	}
-	return new_err
+	return newErr
 }
 
 func (s *errorf) Error() string {
 	err := fmt.Sprintf("%s: %s at %s(%d)", s.etype.String(), s.message, s.funcName, s.fileLine)
-	if (s.next != nil) {
+	if s.next != nil {
 		err += "\n" + s.next.Error()
 	}
 	return err

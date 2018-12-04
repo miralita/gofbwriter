@@ -1,8 +1,8 @@
-package go_fbwriter
+package gofbwriter
 
 import "testing"
 
 func TestCaller(t *testing.T) {
-	err := makeError(ERR_EMPTY_FIRST_NAME, "test")
+	err := makeError(ErrEmptyFirstName, "test")
 	t.Log(err)
 }

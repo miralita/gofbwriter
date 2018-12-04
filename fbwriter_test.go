@@ -1,4 +1,4 @@
-package go_fbwriter_test
+package gofbwriter_test
 
 import (
 	"github.com/miralita/go-fbwriter"
@@ -7,7 +7,7 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	book := go_fbwriter.NewBook()
+	book := gofbwriter.NewBook()
 	t.Log(book)
 
 	var b strings.Builder

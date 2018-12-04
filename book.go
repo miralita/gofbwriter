@@ -1,10 +1,10 @@
-package go_fbwriter
+package gofbwriter
 
 type book struct {
-	stylesheet *stylesheet
+	stylesheet  *stylesheet
 	description *description
-	body *body
-	binary []binary
+	body        *body
+	binary      []binary
 }
 
 func (s *book) SetStylesheet(ctype, data string) (*stylesheet, error) {
