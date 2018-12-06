@@ -4,10 +4,6 @@ type fb interface {
 	ToXML() (string, error)
 }
 
-type body struct {
-	book *book
-}
-
 type binary struct {
 	ID          string
 	ContentType string
