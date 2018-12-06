@@ -10,6 +10,13 @@ type binary struct {
 	Data        []byte
 }
 
+type cite struct {
+}
+
+func (*cite) ToXML() (string, error) {
+	panic("implement me")
+}
+
 type itype int
 
 const (

@@ -4,16 +4,19 @@ type poem struct {
 	title *title
 }
 
-type annotation struct {
+func (*poem) ToXML() (string, error) {
+	panic("implement me")
 }
 
-type epigraph struct {
-	textAuthor string
-	items      []*item
+type annotation struct {
 }
 
 type section struct {
 	title    *title
 	epigraph *epigraph
 	image    *image
+}
+
+func (*section) ToXML() (string, error) {
+	panic("implement me")
 }

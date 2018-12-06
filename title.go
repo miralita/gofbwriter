@@ -6,11 +6,11 @@ type title struct {
 	items []fb
 }
 
-func (s *title) AddParagraph(str string) {
-	s.addItem(&p{text: str})
+func (s *title) CreateParagraph(str string) {
+	s.appendItem(&p{text: str})
 }
 
-func (s *title) addItem(i fb) {
+func (s *title) appendItem(i fb) {
 	if s.items == nil {
 		s.items = []fb{i}
 	} else {
@@ -18,8 +18,8 @@ func (s *title) addItem(i fb) {
 	}
 }
 
-func (s *title) AddEmptyline() {
-	s.addItem(&empty{})
+func (s *title) CreateEmptyline() {
+	s.appendItem(&empty{})
 }
 
 func (s *title) ToXML() (string, error) {
