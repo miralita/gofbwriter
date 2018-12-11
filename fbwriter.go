@@ -17,12 +17,15 @@ func makeTag(tagName, tagValue string) string {
 	return fmt.Sprintf("<%s>%s</%s>\n", tagName, tagValue, tagName)
 }
 
-func makeTagMulti(tagName string, tagValue []string) string {
+func makeTagMulti(tagName string, tagValue []string, sanitize bool) string {
 	if tagValue == nil || len(tagValue) == 0 {
 		return ""
 	}
 	ret := ""
 	for _, s := range tagValue {
+		if sanitize {
+			s = sanitizeString(s)
+		}
 		ret += makeTag(tagName, s)
 	}
 	return ret

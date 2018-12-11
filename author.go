@@ -86,11 +86,11 @@ func (s *author) ToXML() (string, error) {
 	var b strings.Builder
 	b.WriteString("<author>\n")
 	b.WriteString(makeTag("first-name", s.firstName))
-	b.WriteString(makeTagMulti("middle-name", s.middleName))
+	b.WriteString(makeTagMulti("middle-name", s.middleName, true))
 	b.WriteString(makeTag("last-name", s.lastName))
-	b.WriteString(makeTagMulti("nickname", s.nickname))
-	b.WriteString(makeTagMulti("home-page", s.homePage))
-	b.WriteString(makeTagMulti("email", s.email))
+	b.WriteString(makeTagMulti("nickname", s.nickname, true))
+	b.WriteString(makeTagMulti("home-page", s.homePage, true))
+	b.WriteString(makeTagMulti("email", s.email, true))
 	b.WriteString("</author>\n")
 	return b.String(), nil
 }

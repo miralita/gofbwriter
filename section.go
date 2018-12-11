@@ -1,13 +1,5 @@
 package gofbwriter
 
-type poem struct {
-	title *title
-}
-
-func (*poem) ToXML() (string, error) {
-	panic("implement me")
-}
-
 type annotation struct {
 }
 

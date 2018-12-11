@@ -3,6 +3,21 @@ package gofbwriter
 import "strings"
 
 //An epigraph
+/*<xs:complexType name="epigraphType">
+  <xs:annotation>
+    <xs:documentation>An epigraph</xs:documentation>
+  </xs:annotation>
+  <xs:sequence>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="p" type="pType"/>
+      <xs:element name="poem" type="poemType"/>
+      <xs:element name="cite" type="citeType"/>
+      <xs:element name="empty-line"/>
+    </xs:choice>
+    <xs:element name="text-author" type="pType" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+  <xs:attribute name="id" type="xs:ID" use="optional"/>
+</xs:complexType>*/
 type epigraph struct {
 	textAuthors []string
 	items       []fb
