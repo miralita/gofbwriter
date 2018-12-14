@@ -2,6 +2,7 @@ package gofbwriter
 
 import "strings"
 
+//A title, used in sections, poems and body elements
 type title struct {
 	items []fb
 }

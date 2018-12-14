@@ -2,6 +2,7 @@ package gofbwriter
 
 import "strings"
 
+//An empty element with an image name as an attribute
 type image struct {
 	title string
 	alt   string
@@ -60,5 +61,6 @@ func (i *image) ToXML() (string, error) {
 		b.WriteString(" ")
 		b.WriteString(makeAttribute("href", i.href))
 	}
+	b.WriteString(" />")
 	return b.String(), nil
 }

@@ -1,5 +1,6 @@
 package gofbwriter
 
+//A basic paragraph, may include simple formatting inside
 type p struct {
 	text string
 }
