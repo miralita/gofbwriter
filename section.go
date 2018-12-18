@@ -1,8 +1,5 @@
 package gofbwriter
 
-type annotation struct {
-}
-
 type section struct {
 	title    *title
 	epigraph *epigraph

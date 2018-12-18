@@ -2,35 +2,39 @@ package gofbwriter
 
 import "strings"
 
-//An empty element with an image name as an attribute
-type image struct {
-	title string
+type inlineImage struct {
 	alt   string
 	ctype string
 	href  string
 }
 
-func (i *image) Href() string {
+//An empty element with an image name as an attribute
+type image struct {
+	inlineImage
+	title string
+}
+
+func (i *inlineImage) Href() string {
 	return i.href
 }
 
-func (i *image) SetHref(href string) {
+func (i *inlineImage) SetHref(href string) {
 	i.href = href
 }
 
-func (i *image) Ctype() string {
+func (i *inlineImage) Ctype() string {
 	return i.ctype
 }
 
-func (i *image) SetCtype(ctype string) {
+func (i *inlineImage) SetCtype(ctype string) {
 	i.ctype = ctype
 }
 
-func (i *image) Alt() string {
+func (i *inlineImage) Alt() string {
 	return i.alt
 }
 
-func (i *image) SetAlt(alt string) {
+func (i *inlineImage) SetAlt(alt string) {
 	i.alt = alt
 }
 
@@ -40,6 +44,25 @@ func (i *image) Title() string {
 
 func (i *image) SetTitle(title string) {
 	i.title = title
+}
+
+func (i *inlineImage) ToXML() (string, error) {
+	var b strings.Builder
+	b.WriteString("<image")
+	if i.ctype != "" {
+		b.WriteString(" ")
+		b.WriteString(makeAttribute("ctype", i.ctype))
+	}
+	if i.alt != "" {
+		b.WriteString(" ")
+		b.WriteString(makeAttribute("alt", i.alt))
+	}
+	if i.href != "" {
+		b.WriteString(" ")
+		b.WriteString(makeAttribute("href", i.href))
+	}
+	b.WriteString(" />")
+	return b.String(), nil
 }
 
 func (i *image) ToXML() (string, error) {

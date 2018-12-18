@@ -1,7 +1,10 @@
 package gofbwriter
 
-import "strings"
+import (
+	"strings"
+)
 
+//Information about a single author
 type author struct {
 	firstName  string
 	middleName []string
@@ -10,7 +13,12 @@ type author struct {
 	homePage   []string
 	email      []string
 	id         []string
+	tagName    string
 	book       *book
+}
+
+func (s *author) setTagName(name string) {
+	s.tagName = name
 }
 
 func (s *author) Email() []string {
@@ -84,13 +92,20 @@ func (s *author) ToXML() (string, error) {
 		return "", makeError(ErrEmptyField, "Empty required field: author/nickname")
 	}
 	var b strings.Builder
-	b.WriteString("<author>\n")
+	if s.tagName == "" {
+		s.tagName = "author"
+	}
+	b.WriteString("<")
+	b.WriteString(s.tagName)
+	b.WriteString(">\n")
 	b.WriteString(makeTag("first-name", s.firstName))
 	b.WriteString(makeTagMulti("middle-name", s.middleName, true))
 	b.WriteString(makeTag("last-name", s.lastName))
 	b.WriteString(makeTagMulti("nickname", s.nickname, true))
 	b.WriteString(makeTagMulti("home-page", s.homePage, true))
 	b.WriteString(makeTagMulti("email", s.email, true))
-	b.WriteString("</author>\n")
+	b.WriteString("</")
+	b.WriteString(s.tagName)
+	b.WriteString(">\n")
 	return b.String(), nil
 }

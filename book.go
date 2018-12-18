@@ -1,25 +1,24 @@
 package gofbwriter
 
 type book struct {
-	stylesheet  *stylesheet
+	//This element contains an arbitrary stylesheet that is intepreted by a some processing programs, e.g. text/css stylesheets can be used by XSLT stylesheets to generate better looking html
+	stylesheets []*stylesheet
 	description *description
 	body        *body
 	binary      []binary
 }
 
-func (s *book) SetStylesheet(ctype, data string) (*stylesheet, error) {
+func (s *book) CreateStylesheet(ctype, data string) (*stylesheet, error) {
 	if ctype == "" {
 		ctype = "text/css"
 	}
-	s.stylesheet = &stylesheet{ctype, data, s}
-	return s.stylesheet, nil
-}
-
-func (s *book) Stylesheet() *stylesheet {
-	if s.stylesheet == nil {
-		s.stylesheet = &stylesheet{book: s}
+	st := &stylesheet{ctype, data, s}
+	if s.stylesheets == nil {
+		s.stylesheets = []*stylesheet{st}
+	} else {
+		s.stylesheets = append(s.stylesheets, st)
 	}
-	return s.stylesheet
+	return st, nil
 }
 
 func (s *book) Description() *description {

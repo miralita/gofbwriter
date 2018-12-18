@@ -16,6 +16,7 @@ import (
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>*/
+//A human readable date, maybe not exact, with an optional computer readable variant
 type date time.Time
 
 func (s *date) ToXML() (string, error) {
