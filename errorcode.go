@@ -18,6 +18,10 @@ const (
 	ErrNestedEntity
 	//ErrUnsupportedNestedItem - unsupported nested item
 	ErrUnsupportedNestedItem
+	//ErrEmptyAttribute - empty required attribute
+	ErrEmptyAttribute
+	//ErrToManyItems - to many items
+	ErrToManyItems
 	//ErrSystem - system error
 	ErrSystem
 )
