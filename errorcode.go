@@ -22,6 +22,8 @@ const (
 	ErrEmptyAttribute
 	//ErrToManyItems - to many items
 	ErrToManyItems
+	//ErrUnknownEnumValue - unsupported value for enumeration
+	ErrUnknownEnumValue
 	//ErrSystem - system error
 	ErrSystem
 )
