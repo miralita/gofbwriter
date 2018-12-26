@@ -23,3 +23,7 @@ func (s *customInfo) ToXML() (string, error) {
 	b.WriteString("</custom-info>\n")
 	return b.String(), nil
 }
+
+func (s *customInfo) tag() string {
+	return "custom-info"
+}

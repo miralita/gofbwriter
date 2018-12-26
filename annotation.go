@@ -11,3 +11,10 @@ func (*annotation) ToXML() (string, error) {
 func (s *annotation) AddParagraph(p string) {
 	panic("implement me")
 }
+
+func (s *annotation) tag() string {
+	if s.tagName == "" {
+		s.tagName = "annotation"
+	}
+	return s.tagName
+}

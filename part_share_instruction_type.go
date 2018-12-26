@@ -1,13 +1,13 @@
 package gofbwriter
 
 import (
-	"fmt"
 	"strings"
 )
 
 //DocGenerationInstructionType - List of instructions to process sections (allow|deny|require)
 type DocGenerationInstructionType int
 
+//Value - text value for doc_generation_instruction_type
 func (s DocGenerationInstructionType) Value() (string, error) {
 	val := ""
 	switch s {
@@ -27,7 +27,7 @@ func (s DocGenerationInstructionType) Value() (string, error) {
 
 const (
 	//InstructionTypeRequire - Require
-	InstructionTypeRequire DocGenerationInstructionType = iota
+	InstructionTypeRequire DocGenerationInstructionType = iota + 1
 	//InstructionTypeAllow - Allow
 	InstructionTypeAllow
 	//InstructionTypeDeny - Deny
@@ -49,7 +49,7 @@ func (s *partShareInstructionType) ToXML() (string, error) {
 	if s.href == "" {
 		return "", makeError(ErrEmptyAttribute, "Empty required attribute %s/href", s.tagName)
 	}
-	if s.include == "" {
+	if s.include == 0 {
 		return "", makeError(ErrEmptyAttribute, "Empty required attribute %s/include", s.tagName)
 	}
 	var b strings.Builder
@@ -67,4 +67,13 @@ func (s *partShareInstructionType) ToXML() (string, error) {
 		return "", wrapError(err, ErrNestedEntity, "Can't make %s/include attribute", s.tagName)
 	}
 	b.WriteString(makeAttribute("include", str))
+	b.WriteString(">\n")
+	return b.String(), nil
+}
+
+func (s *partShareInstructionType) tag() string {
+	if s.tagName == "" {
+		s.tagName = "part"
+	}
+	return s.tagName
 }

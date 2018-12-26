@@ -75,3 +75,7 @@ func (s *stanza) ToXML() (string, error) {
 	b.WriteString("</stanza>\n")
 	return b.String(), nil
 }
+
+func (s *stanza) tag() string {
+	return "stanza"
+}

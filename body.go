@@ -8,6 +8,7 @@ type body struct {
 	title     *title      //A fancy title for the entire book, should be used if the simple text version in &lt;description&gt; is not adequate, e.g. the book title has multiple paragraphs and/or character styles
 	epigraphs []*epigraph //Epigraph(s) for the entire book, if any
 	sections  []*section
+	name      string
 	book      *book
 }
 
@@ -79,7 +80,12 @@ func (s *body) ToXML() (string, error) {
 		return "", makeError(ErrEmptyField, "Empty required field body/section")
 	}
 	var b strings.Builder
-	b.WriteString("<body>\n")
+	b.WriteString("<body")
+	if s.name != "" {
+		b.WriteString(" ")
+		b.WriteString(makeAttribute("name", s.name))
+	}
+	b.WriteString(">\n")
 	if err := s.serializeImage(&b); err != nil {
 		return "", err
 	}
@@ -140,4 +146,8 @@ func (s *body) serializeSections(b *strings.Builder) error {
 		b.WriteString(str)
 	}
 	return nil
+}
+
+func (s *body) tag() string {
+	return "body"
 }

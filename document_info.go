@@ -231,3 +231,7 @@ func (s *documentInfo) serializeAuthors(b *strings.Builder) error {
 	}
 	return nil
 }
+
+func (s *documentInfo) tag() string {
+	return "document-info"
+}

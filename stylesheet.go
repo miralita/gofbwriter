@@ -27,3 +27,7 @@ func (s *stylesheet) ToXML() (string, error) {
 	b.WriteString("\n</stylesheet>")
 	return b.String(), nil
 }
+
+func (s *stylesheet) tag() string {
+	return "stylesheet"
+}

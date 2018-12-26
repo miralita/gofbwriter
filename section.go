@@ -9,3 +9,7 @@ type section struct {
 func (*section) ToXML() (string, error) {
 	panic("implement me")
 }
+
+func (s *section) tag() string {
+	return "section"
+}

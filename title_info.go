@@ -194,7 +194,7 @@ func (s *titleInfo) ToXML() (string, error) { // nolint: gocyclo
 	if err := s.serializeAnnotation(&b); err != nil {
 		return "", err
 	}
-	s.serializeKeywords(&b)
+	_ = s.serializeKeywords(&b)
 	if err := s.serializeDate(&b); err != nil {
 		return "", err
 	}
@@ -204,7 +204,7 @@ func (s *titleInfo) ToXML() (string, error) { // nolint: gocyclo
 	if err := s.serializeLang(&b); err != nil {
 		return "", err
 	}
-	s.serializeSrcLang(&b)
+	_ = s.serializeSrcLang(&b)
 	if err := s.serializeTranslators(&b); err != nil {
 		return "", err
 	}
@@ -328,4 +328,8 @@ func (s *titleInfo) serializeBookTitle(b *strings.Builder) error {
 	}
 	b.WriteString(makeTag("book-title", s.bookTitle))
 	return nil
+}
+
+func (s *titleInfo) tag() string {
+	return "title-info"
 }

@@ -39,3 +39,7 @@ func (s *title) ToXML() (string, error) {
 	b.WriteString("</title>\n")
 	return b.String(), nil
 }
+
+func (s *title) tag() string {
+	return "title"
+}

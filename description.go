@@ -181,3 +181,7 @@ func (s *description) serializeTitleInfo(b *strings.Builder) error {
 	b.WriteString(str)
 	return nil
 }
+
+func (s *description) tag() string {
+	return "description"
+}

@@ -109,3 +109,10 @@ func (s *author) ToXML() (string, error) {
 	b.WriteString(">\n")
 	return b.String(), nil
 }
+
+func (s *author) tag() string {
+	if s.tagName == "" {
+		s.tagName = "author"
+	}
+	return s.tagName
+}

@@ -107,3 +107,7 @@ func (s *publishInfo) ToXML() (string, error) {
 	b.WriteString("</publish-info>\n")
 	return b.String(), nil
 }
+
+func (s *publishInfo) tag() string {
+	return "publish-info"
+}

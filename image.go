@@ -87,3 +87,11 @@ func (i *image) ToXML() (string, error) {
 	b.WriteString(" />")
 	return b.String(), nil
 }
+
+func (i *inlineImage) tag() string {
+	return "image"
+}
+
+func (i *image) tag() string {
+	return "image"
+}

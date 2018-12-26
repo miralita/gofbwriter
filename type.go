@@ -2,19 +2,7 @@ package gofbwriter
 
 type fb interface {
 	ToXML() (string, error)
-}
-
-type binary struct {
-	ID          string
-	ContentType string
-	Data        []byte
-}
-
-type cite struct {
-}
-
-func (*cite) ToXML() (string, error) {
-	panic("implement me")
+	tag() string
 }
 
 type itype int

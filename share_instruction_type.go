@@ -8,3 +8,10 @@ type shareInstructionType struct {
 func (*shareInstructionType) ToXML() (string, error) {
 	panic("implement me")
 }
+
+func (s *shareInstructionType) tag() string {
+	if s.tagName == "" {
+		s.tagName = "share-instruction-type"
+	}
+	return s.tagName
+}

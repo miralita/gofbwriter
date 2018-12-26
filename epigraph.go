@@ -102,3 +102,7 @@ func (s *epigraph) ToXML() (string, error) {
 	b.WriteString("</epigraph>\n")
 	return b.String(), nil
 }
+
+func (s *epigraph) tag() string {
+	return "epigraph"
+}

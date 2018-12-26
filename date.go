@@ -23,3 +23,7 @@ func (s *date) ToXML() (string, error) {
 	dt := time.Time(*s).String()
 	return fmt.Sprintf(`<date value="%s">%s</date>`, dt, dt), nil
 }
+
+func (s *date) tag() string {
+	return "date"
+}

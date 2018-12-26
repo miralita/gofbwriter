@@ -65,7 +65,11 @@ func (s *poem) Title() *title {
 type subtitle string
 
 func (s subtitle) ToXML() (string, error) {
-	return makeTag("subtitle", sanitizeString(string(s))), nil
+	return makeTag(s.tag(), sanitizeString(string(s))), nil
+}
+
+func (s subtitle) tag() string {
+	return "subtitle"
 }
 
 func (s *poem) SetDate(dt time.Time) {
@@ -196,4 +200,8 @@ func (s *poem) makeDate(b *strings.Builder) error {
 	}
 	b.WriteString(str)
 	return nil
+}
+
+func (s *poem) tag() string {
+	return "poem"
 }
