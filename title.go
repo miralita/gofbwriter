@@ -1,6 +1,9 @@
 package gofbwriter
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 //A title, used in sections, poems and body elements
 type title struct {
@@ -25,18 +28,18 @@ func (s *title) CreateEmptyline() {
 
 func (s *title) ToXML() (string, error) {
 	if s.items == nil || len(s.items) == 0 {
-		return "<title />\n", nil
+		return fmt.Sprintf("<%s />\n", s.tag()), nil
 	}
 	var b strings.Builder
-	b.WriteString("<title>")
+	fmt.Fprintf(&b, "<%s>\n", s.tag())
 	for _, i := range s.items {
 		str, err := i.ToXML()
 		if err != nil {
-			return "", wrapError(err, ErrNestedEntity, "Can't make title nested elements")
+			return "", wrapError(err, ErrNestedEntity, "Can't make %s/%s", s.tag(), i.tag())
 		}
 		b.WriteString(str)
 	}
-	b.WriteString("</title>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 

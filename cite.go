@@ -1,6 +1,9 @@
 package gofbwriter
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 //A citation with an optional citation author at the end
 type cite struct {
@@ -79,7 +82,7 @@ func (s *cite) AppendItem(item fb) error {
 
 func (s *cite) ToXML() (string, error) {
 	var b strings.Builder
-	b.WriteString("<cite")
+	fmt.Fprintf(&b, "<%s", s.tag())
 	if s.id != "" {
 		b.WriteString(" ")
 		b.WriteString(makeAttribute("id", sanitizeString(s.id)))
@@ -89,13 +92,13 @@ func (s *cite) ToXML() (string, error) {
 		for _, item := range s.items {
 			str, err := item.ToXML()
 			if err != nil {
-				return "", wrapError(err, ErrNestedEntity, "Can't make cite/%s", item)
+				return "", wrapError(err, ErrNestedEntity, "Can't make %s/%s", s.tag(), item.tag())
 			}
 			b.WriteString(str)
 		}
 	}
 
-	b.WriteString("</cite>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 

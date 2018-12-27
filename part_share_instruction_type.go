@@ -1,6 +1,7 @@
 package gofbwriter
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -43,18 +44,14 @@ type partShareInstructionType struct {
 }
 
 func (s *partShareInstructionType) ToXML() (string, error) {
-	if s.tagName == "" {
-		s.tagName = "part"
-	}
 	if s.href == "" {
-		return "", makeError(ErrEmptyAttribute, "Empty required attribute %s/href", s.tagName)
+		return "", makeError(ErrEmptyAttribute, "Empty required attribute %s/href", s.tag())
 	}
 	if s.include == 0 {
-		return "", makeError(ErrEmptyAttribute, "Empty required attribute %s/include", s.tagName)
+		return "", makeError(ErrEmptyAttribute, "Empty required attribute %s/include", s.tag())
 	}
 	var b strings.Builder
-	b.WriteString("<")
-	b.WriteString(s.tagName)
+	fmt.Fprintf(&b, "<%s", s.tag())
 	if s.linkType != "" {
 		b.WriteString(" ")
 		b.WriteString(makeAttribute("type", s.linkType))
@@ -64,10 +61,10 @@ func (s *partShareInstructionType) ToXML() (string, error) {
 	b.WriteString(" ")
 	str, err := s.include.Value()
 	if err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make %s/include attribute", s.tagName)
+		return "", wrapError(err, ErrNestedEntity, "Can't make %s/include attribute", s.tag())
 	}
 	b.WriteString(makeAttribute("include", str))
-	b.WriteString(">\n")
+	b.WriteString(" />\n")
 	return b.String(), nil
 }
 

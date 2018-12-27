@@ -1,6 +1,9 @@
 package gofbwriter
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type inlineImage struct {
 	alt   string
@@ -48,7 +51,7 @@ func (i *image) SetTitle(title string) {
 
 func (i *inlineImage) ToXML() (string, error) {
 	var b strings.Builder
-	b.WriteString("<image")
+	fmt.Fprintf(&b, "<%s", i.tag())
 	if i.ctype != "" {
 		b.WriteString(" ")
 		b.WriteString(makeAttribute("ctype", i.ctype))
@@ -67,7 +70,7 @@ func (i *inlineImage) ToXML() (string, error) {
 
 func (i *image) ToXML() (string, error) {
 	var b strings.Builder
-	b.WriteString("<image")
+	fmt.Fprintf(&b, "<%s", i.tag())
 	if i.title != "" {
 		b.WriteString(" ")
 		b.WriteString(makeAttribute("title", i.title))

@@ -12,15 +12,15 @@ type customInfo struct {
 
 func (s *customInfo) ToXML() (string, error) {
 	if s.info == "" {
-		return "", makeError(ErrEmptyField, "Empty custom-info value")
+		return "", makeError(ErrEmptyField, "Empty %s value", s.tag())
 	}
 	if s.infoType == "" {
-		return "", makeError(ErrEmptyAttribute, "Empty attribute info-type for custom-info")
+		return "", makeError(ErrEmptyAttribute, "Empty attribute %s for custom-info", s.tag())
 	}
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("<custom-info %s>\n", makeAttribute("info-type", s.infoType)))
+	b.WriteString(fmt.Sprintf("<%s %s>\n", s.tag(), makeAttribute("info-type", s.infoType)))
 	b.WriteString(s.info)
-	b.WriteString("</custom-info>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 

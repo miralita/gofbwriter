@@ -79,7 +79,7 @@ func (s *publishInfo) SetBookName(bookName string) {
 
 func (s *publishInfo) ToXML() (string, error) {
 	var b strings.Builder
-	b.WriteString("<publish-info>\n")
+	fmt.Fprintf(&b, "<%s>\n", s.tag())
 	if s.bookName != "" {
 		b.WriteString(makeTag("book-name", sanitizeString(s.bookName)))
 	}
@@ -99,12 +99,12 @@ func (s *publishInfo) ToXML() (string, error) {
 		for _, seq := range s.sequence {
 			str, err := seq.ToXML()
 			if err != nil {
-				return "", wrapError(err, ErrNestedEntity, "Can't make publish-info/sequence")
+				return "", wrapError(err, ErrNestedEntity, "Can't make %s/sequence", s.tag())
 			}
 			b.WriteString(str)
 		}
 	}
-	b.WriteString("</publish-info>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 

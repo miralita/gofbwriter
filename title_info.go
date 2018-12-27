@@ -1,6 +1,7 @@
 package gofbwriter
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -164,23 +165,9 @@ func (s *titleInfo) CreateAuthor(firstName, middleName, lastName string) *author
 	return author
 }
 
-func (s *titleInfo) openTag(b *strings.Builder) {
-	if s.tagName == "" {
-		s.tagName = "title-info"
-	}
-	b.WriteString("<")
-	b.WriteString(s.tagName)
-	b.WriteString(">\n")
-}
-
-func (s *titleInfo) closeTag(b *strings.Builder) {
-	b.WriteString("</")
-	b.WriteString(s.tagName)
-	b.WriteString(">\n")
-}
-
 func (s *titleInfo) ToXML() (string, error) { // nolint: gocyclo
 	var b strings.Builder
+	fmt.Fprintf(&b, "<%s>\n", s.tag())
 
 	if err := s.serializeGenres(&b); err != nil {
 		return "", err
@@ -211,6 +198,7 @@ func (s *titleInfo) ToXML() (string, error) { // nolint: gocyclo
 	if err := s.serializeSequences(&b); err != nil {
 		return "", err
 	}
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 
@@ -219,7 +207,7 @@ func (s *titleInfo) serializeSequences(b *strings.Builder) error {
 		for _, tr := range s.sequences {
 			str, err := tr.ToXML()
 			if err != nil {
-				return wrapError(err, ErrNestedEntity, "Can't make %s/sequence", s.tagName)
+				return wrapError(err, ErrNestedEntity, "Can't make %s/sequence", s.tag())
 			}
 			b.WriteString(str)
 		}
@@ -249,7 +237,7 @@ func (s *titleInfo) serializeSrcLang(b *strings.Builder) error {
 
 func (s *titleInfo) serializeLang(b *strings.Builder) error {
 	if s.lang == "" {
-		return makeError(ErrEmptyField, "Empty required %s/lang", s.tagName)
+		return makeError(ErrEmptyField, "Empty required %s/lang", s.tag())
 	}
 	b.WriteString(makeTag("lang", s.lang))
 	return nil
@@ -259,7 +247,7 @@ func (s *titleInfo) serializeCoverpage(b *strings.Builder) error {
 	if s.coverpage != nil {
 		str, err := s.coverpage.ToXML()
 		if err != nil {
-			return wrapError(err, ErrNestedEntity, "Can't make %s/coverpage", s.tagName)
+			return wrapError(err, ErrNestedEntity, "Can't make %s/coverpage", s.tag())
 		}
 		b.WriteString("<coverpage>")
 		b.WriteString(str)
@@ -272,7 +260,7 @@ func (s *titleInfo) serializeDate(b *strings.Builder) error {
 	if s.date != nil {
 		str, err := s.date.ToXML()
 		if err != nil {
-			return wrapError(err, ErrNestedEntity, "Can't make %s/date", s.tagName)
+			return wrapError(err, ErrNestedEntity, "Can't make %s/date", s.tag())
 		}
 		b.WriteString(str)
 	}
@@ -290,7 +278,7 @@ func (s *titleInfo) serializeAnnotation(b *strings.Builder) error {
 	if s.annotation != nil {
 		str, err := s.annotation.ToXML()
 		if err != nil {
-			return wrapError(err, ErrNestedEntity, "Can't make %s/annotation", s.tagName)
+			return wrapError(err, ErrNestedEntity, "Can't make %s/annotation", s.tag())
 		}
 		b.WriteString(str)
 	}
@@ -299,7 +287,7 @@ func (s *titleInfo) serializeAnnotation(b *strings.Builder) error {
 
 func (s *titleInfo) serializeGenres(b *strings.Builder) error {
 	if s.genres == nil || len(s.genres) == 0 {
-		return makeError(ErrEmptyField, "Empty required field %s/genre", s.tagName)
+		return makeError(ErrEmptyField, "Empty required field %s/genre", s.tag())
 	}
 	for _, g := range s.genres {
 		b.WriteString(makeTag("genre", g.toString()))
@@ -309,13 +297,13 @@ func (s *titleInfo) serializeGenres(b *strings.Builder) error {
 
 func (s *titleInfo) serializeAuthors(b *strings.Builder) error {
 	if s.authors == nil || len(s.authors) == 0 {
-		return makeError(ErrEmptyField, "Empty required field %s/author", s.tagName)
+		return makeError(ErrEmptyField, "Empty required field %s/author", s.tag())
 	}
 
 	for _, a := range s.authors {
 		xml, err := a.ToXML()
 		if err != nil {
-			return wrapError(err, ErrNestedEntity, "Can't make %s/author", s.tagName)
+			return wrapError(err, ErrNestedEntity, "Can't make %s/author", s.tag())
 		}
 		b.WriteString(xml)
 	}
@@ -324,7 +312,7 @@ func (s *titleInfo) serializeAuthors(b *strings.Builder) error {
 
 func (s *titleInfo) serializeBookTitle(b *strings.Builder) error {
 	if s.bookTitle == "" {
-		return makeError(ErrEmptyField, "Empty required field %s/book-title", s.tagName)
+		return makeError(ErrEmptyField, "Empty required field %s/book-title", s.tag())
 	}
 	b.WriteString(makeTag("book-title", s.bookTitle))
 	return nil

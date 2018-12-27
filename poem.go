@@ -1,6 +1,7 @@
 package gofbwriter
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -114,23 +115,23 @@ func (s *poem) CreateEpigraph() *epigraph {
 
 func (s *poem) ToXML() (string, error) {
 	var b strings.Builder
-	b.WriteString("<poem>\n")
+	fmt.Fprintf(&b, "<%s>\n", s.tag())
 	if err := s.makeTitle(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make poem/title")
+		return "", wrapError(err, ErrNestedEntity, "Can't make %s/title", s.tag())
 	}
 	if err := s.makeEpigraphs(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make poem/epigraph")
+		return "", wrapError(err, ErrNestedEntity, "Can't make %s/epigraph", s.tag())
 	}
 	if err := s.makeStanzas(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make poem/stanza")
+		return "", wrapError(err, ErrNestedEntity, "Can't make %s/stanza", s.tag())
 	}
 	if err := s.makeAuthor(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make poem/text-author")
+		return "", wrapError(err, ErrNestedEntity, "Can't make %s/text-author", s.tag())
 	}
 	if err := s.makeDate(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make poem/date")
+		return "", wrapError(err, ErrNestedEntity, "Can't make %s/date", s.tag())
 	}
-	b.WriteString("</poem>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 
@@ -158,7 +159,7 @@ func (s *poem) makeEpigraphs(b *strings.Builder) error {
 
 func (s *poem) makeTitle(b *strings.Builder) error {
 	if s.title == nil {
-		return makeError(ErrEmptyField, "Empty required poem/title")
+		return makeError(ErrEmptyField, "Empty required %s/title", s.tag())
 	}
 	str, err := s.title.ToXML()
 	if err != nil {
@@ -170,7 +171,7 @@ func (s *poem) makeTitle(b *strings.Builder) error {
 
 func (s *poem) makeStanzas(b *strings.Builder) error {
 	if s.items == nil || len(s.items) == 0 {
-		return makeError(ErrEmptyField, "Empty required poem/stanza")
+		return makeError(ErrEmptyField, "Empty required %s/stanza", s.tag())
 	}
 	for _, i := range s.items {
 		str, err := i.ToXML()

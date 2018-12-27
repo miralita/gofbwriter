@@ -1,6 +1,7 @@
 package gofbwriter
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -89,24 +90,18 @@ func (s *author) ToXML() (string, error) {
 	if s.firstName != "" && s.lastName == "" {
 		return "", makeError(ErrEmptyFirstName, "Empty required field: author/first-name")
 	} else if s.firstName == "" && s.lastName == "" {
-		return "", makeError(ErrEmptyField, "Empty required field: author/nickname")
+		return "", makeError(ErrEmptyField, "Empty required field: %s/nickname", s.tag())
 	}
 	var b strings.Builder
-	if s.tagName == "" {
-		s.tagName = "author"
-	}
-	b.WriteString("<")
-	b.WriteString(s.tagName)
-	b.WriteString(">\n")
+
+	fmt.Fprintf(&b, "<%s>\n", s.tag())
 	b.WriteString(makeTag("first-name", s.firstName))
 	b.WriteString(makeTagMulti("middle-name", s.middleName, true))
 	b.WriteString(makeTag("last-name", s.lastName))
 	b.WriteString(makeTagMulti("nickname", s.nickname, true))
 	b.WriteString(makeTagMulti("home-page", s.homePage, true))
 	b.WriteString(makeTagMulti("email", s.email, true))
-	b.WriteString("</")
-	b.WriteString(s.tagName)
-	b.WriteString(">\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 

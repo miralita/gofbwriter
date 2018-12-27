@@ -1,6 +1,9 @@
 package gofbwriter
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 //An epigraph
 /*<xs:complexType name="epigraphType">
@@ -81,15 +84,15 @@ func (s *epigraph) AppendItem(item fb) error {
 
 func (s *epigraph) ToXML() (string, error) {
 	if (s.items == nil || len(s.items) == 0) && (s.textAuthors == nil || len(s.textAuthors) == 0) {
-		return "<epigraph />\n", nil
+		return fmt.Sprintf("<%s />\n", s.tag()), nil
 	}
 	var b strings.Builder
-	b.WriteString("<epigraph>")
+	fmt.Fprintf(&b, "<%s>\n", s.tag())
 	if s.items != nil {
 		for _, i := range s.items {
 			str, err := i.ToXML()
 			if err != nil {
-				return "", wrapError(err, ErrNestedEntity, "Can't make title nested elements for epigraph/*")
+				return "", wrapError(err, ErrNestedEntity, "Can't make %s/%s", s.tag(), i.tag())
 			}
 			b.WriteString(str)
 		}
@@ -99,7 +102,7 @@ func (s *epigraph) ToXML() (string, error) {
 			b.WriteString(makeTag("text-author", sanitizeString(i)))
 		}
 	}
-	b.WriteString("</epigraph>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 

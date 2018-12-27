@@ -18,13 +18,11 @@ func (s *stylesheet) Set(ctype, data string) {
 
 func (s *stylesheet) ToXML() (string, error) {
 	var b strings.Builder
-	b.WriteString("<stylesheet")
+	fmt.Fprintf(&b, "<%s", s.tag())
 	if s.ctype != "" {
 		fmt.Fprintf(&b, ` type="%s"`, s.ctype)
 	}
-	b.WriteString(">\n")
-	b.WriteString(s.data)
-	b.WriteString("\n</stylesheet>")
+	fmt.Fprintf(&b, ">\n%s\n</%s>\n", s.data, s.tag())
 	return b.String(), nil
 }
 

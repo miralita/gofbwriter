@@ -2,6 +2,7 @@ package gofbwriter
 
 import (
 	"encoding/base64"
+	"fmt"
 	"strings"
 )
 
@@ -26,13 +27,9 @@ func (s *binary) ID() string {
 
 func (s *binary) ToXML() (string, error) {
 	var b strings.Builder
-	b.WriteString("<binary ")
-	b.WriteString(makeAttribute("id", s.id))
-	b.WriteString(" ")
-	b.WriteString(makeAttribute("content-type", s.contentType))
-	b.WriteString(">")
+	fmt.Fprintf(&b, "<%s %s %s>", s.tag(), makeAttribute("id", s.id), makeAttribute("content-type", s.contentType))
 	b.WriteString(base64.StdEncoding.EncodeToString(s.data))
-	b.WriteString("</binary>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 

@@ -21,7 +21,7 @@ type date time.Time
 
 func (s *date) ToXML() (string, error) {
 	dt := time.Time(*s).String()
-	return fmt.Sprintf(`<date value="%s">%s</date>`, dt, dt), nil
+	return fmt.Sprintf(`<%s value="%s">%s</%s>`, s.tag(), dt, dt, s.tag()), nil
 }
 
 func (s *date) tag() string {

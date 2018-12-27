@@ -1,6 +1,9 @@
 package gofbwriter
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 //Root element
 type book struct {
@@ -79,9 +82,9 @@ func (s *book) CreateDescription() *description {
 
 func (s *book) ToXML() (string, error) {
 	var b strings.Builder
-	b.WriteString(`<?xml version="1.0" encoding="UTF-8"?>
-<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
-`)
+	fmt.Fprintf(&b, `<?xml version="1.0" encoding="UTF-8"?>
+<%s xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+`, s.tag())
 	if err := s.makeStylesheets(&b); err != nil {
 		return "", err
 	}
@@ -97,7 +100,7 @@ func (s *book) ToXML() (string, error) {
 	if err := s.makeBinary(&b); err != nil {
 		return "", err
 	}
-	b.WriteString("</FictionBook>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 
@@ -106,7 +109,7 @@ func (s *book) makeBinary(b *strings.Builder) error {
 		for _, bin := range s.binary {
 			str, err := bin.ToXML()
 			if err != nil {
-				return wrapError(err, ErrNestedEntity, "Can't make FictionBook/binary")
+				return wrapError(err, ErrNestedEntity, "Can't make %s/binary", s.tag())
 			}
 			b.WriteString(str)
 		}
@@ -119,7 +122,7 @@ func (s *book) makeNotes(b *strings.Builder) error {
 		for _, n := range s.notes {
 			str, err := n.ToXML()
 			if err != nil {
-				return wrapError(err, ErrNestedEntity, "Can't make FictionBook/body (notes)")
+				return wrapError(err, ErrNestedEntity, "Can't make %s/body (notes)", s.tag())
 			}
 			b.WriteString(str)
 		}
@@ -129,11 +132,11 @@ func (s *book) makeNotes(b *strings.Builder) error {
 
 func (s *book) makeBody(b *strings.Builder) error {
 	if s.body == nil {
-		return makeError(ErrEmptyField, "Empty required FictionBook/body")
+		return makeError(ErrEmptyField, "Empty required %s/body", s.tag())
 	}
 	str, err := s.body.ToXML()
 	if err != nil {
-		return wrapError(err, ErrNestedEntity, "Can't make FictionBook/body")
+		return wrapError(err, ErrNestedEntity, "Can't make %s/body", s.tag())
 	}
 	b.WriteString(str)
 	return nil
@@ -141,11 +144,11 @@ func (s *book) makeBody(b *strings.Builder) error {
 
 func (s *book) makeDescription(b *strings.Builder) error {
 	if s.description == nil {
-		return makeError(ErrEmptyField, "Empty required FictionBook/description")
+		return makeError(ErrEmptyField, "Empty required %s/description", s.tag())
 	}
 	str, err := s.description.ToXML()
 	if err != nil {
-		return wrapError(err, ErrNestedEntity, "Can't make FictionBook/description")
+		return wrapError(err, ErrNestedEntity, "Can't make %s/description", s.tag())
 	}
 	b.WriteString(str)
 	return nil

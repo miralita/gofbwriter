@@ -1,6 +1,9 @@
 package gofbwriter
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 /*<xs:element name="stanza">
   <xs:annotation>
@@ -57,14 +60,14 @@ func (s *stanza) AddLine(line string) {
 
 func (s *stanza) ToXML() (string, error) {
 	if s.lines == nil || len(s.lines) == 0 {
-		return "", makeError(ErrEmptyField, "Empty required stanza/v")
+		return "", makeError(ErrEmptyField, "Empty required %s/v", s.tag())
 	}
 	var b strings.Builder
-	b.WriteString("<stanza>\n")
+	fmt.Fprintf(&b, "<%s>\n", s.tag())
 	if s.title != nil {
 		str, err := s.ToXML()
 		if err != nil {
-			return "", wrapError(err, ErrNestedEntity, "Can't make stanza/title")
+			return "", wrapError(err, ErrNestedEntity, "Can't make %s/title", s.tag())
 		}
 		b.WriteString(str)
 	}
@@ -72,7 +75,8 @@ func (s *stanza) ToXML() (string, error) {
 		b.WriteString(makeTag("subtitle", sanitizeString(s.subtitle)))
 	}
 	b.WriteString(makeTagMulti("v", s.lines, true))
-	b.WriteString("</stanza>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
+
 	return b.String(), nil
 }
 

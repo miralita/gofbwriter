@@ -1,5 +1,7 @@
 package gofbwriter
 
+import "fmt"
+
 //A basic paragraph, may include simple formatting inside
 type p struct {
 	tagName string
@@ -21,7 +23,7 @@ type empty struct {
 }
 
 func (s *empty) ToXML() (string, error) {
-	return "<empty-line />", nil
+	return fmt.Sprintf("<%s />\n", s.tag()), nil
 }
 
 func (s *empty) tag() string {

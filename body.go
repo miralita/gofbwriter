@@ -1,6 +1,9 @@
 package gofbwriter
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 //Main content of the book, multiple bodies are used for additional information, like footnotes, that do not appear in the main book flow (extended from this class). The first body is presented to the reader by default, and content in the other bodies should be accessible by hyperlinks.
 type body struct {
@@ -77,13 +80,12 @@ func (s *body) SetImage(image *image) {
 
 func (s *body) ToXML() (string, error) {
 	if s.sections == nil || len(s.sections) == 0 {
-		return "", makeError(ErrEmptyField, "Empty required field body/section")
+		return "", makeError(ErrEmptyField, "Empty required field %s/section", s.tag())
 	}
 	var b strings.Builder
-	b.WriteString("<body")
+	fmt.Fprintf(&b, "<%s", s.tag())
 	if s.name != "" {
-		b.WriteString(" ")
-		b.WriteString(makeAttribute("name", s.name))
+		fmt.Fprintf(&b, " %s", makeAttribute("name", s.name))
 	}
 	b.WriteString(">\n")
 	if err := s.serializeImage(&b); err != nil {
@@ -98,7 +100,7 @@ func (s *body) ToXML() (string, error) {
 	if err := s.serializeSections(&b); err != nil {
 		return "", err
 	}
-	b.WriteString("</body>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 
@@ -106,7 +108,7 @@ func (s *body) serializeImage(b *strings.Builder) error {
 	if s.image != nil {
 		i, err := s.image.ToXML()
 		if err != nil {
-			return wrapError(err, ErrNestedEntity, "Can't make body/image")
+			return wrapError(err, ErrNestedEntity, "Can't make %s/image", s.tag())
 		}
 		b.WriteString(i)
 	}
@@ -117,7 +119,7 @@ func (s *body) serializeTitle(b *strings.Builder) error {
 	if s.title != nil {
 		t, err := s.title.ToXML()
 		if err != nil {
-			return wrapError(err, ErrNestedEntity, "Can't make body/title")
+			return wrapError(err, ErrNestedEntity, "Can't make %s/title", s.tag())
 		}
 		b.WriteString(t)
 	}
@@ -129,7 +131,7 @@ func (s *body) serializeEpigraphs(b *strings.Builder) error {
 		for _, ep := range s.epigraphs {
 			str, err := ep.ToXML()
 			if err != nil {
-				return wrapError(err, ErrNestedEntity, "Can't make body/epigraph")
+				return wrapError(err, ErrNestedEntity, "Can't make %s/epigraph", s.tag())
 			}
 			b.WriteString(str)
 		}
@@ -141,7 +143,7 @@ func (s *body) serializeSections(b *strings.Builder) error {
 	for _, sec := range s.sections {
 		str, err := sec.ToXML()
 		if err != nil {
-			return wrapError(err, ErrNestedEntity, "Can't make body/section")
+			return wrapError(err, ErrNestedEntity, "Can't make %s/section", s.tag())
 		}
 		b.WriteString(str)
 	}

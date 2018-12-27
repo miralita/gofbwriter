@@ -135,7 +135,7 @@ func (s *documentInfo) AddAuthor(docAuthor *author) {
 
 func (s *documentInfo) ToXML() (string, error) {
 	var b strings.Builder
-	b.WriteString("<document-info>\n")
+	fmt.Fprintf(&b, "<%s>\n", s.tag())
 	if err := s.serializeAuthors(&b); err != nil {
 		return "", err
 	}
@@ -159,7 +159,7 @@ func (s *documentInfo) ToXML() (string, error) {
 	if err := s.serializePublisher(&b); err != nil {
 		return "", err
 	}
-	b.WriteString("</document-info>\n")
+	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }
 
@@ -168,7 +168,7 @@ func (s *documentInfo) serializePublisher(b *strings.Builder) error {
 		for _, h := range s.publishers {
 			str, err := h.ToXML()
 			if err != nil {
-				return wrapError(err, ErrNestedEntity, "Can't make document-info/publisher")
+				return wrapError(err, ErrNestedEntity, "Can't make %s/publisher", s.tag())
 			}
 			b.WriteString(str)
 		}
@@ -181,7 +181,7 @@ func (s *documentInfo) serializeHistory(b *strings.Builder) error {
 		for _, h := range s.history {
 			str, err := h.ToXML()
 			if err != nil {
-				return wrapError(err, ErrNestedEntity, "Can't make document-info/history")
+				return wrapError(err, ErrNestedEntity, "Can't make %s/history", s.tag())
 			}
 			b.WriteString(str)
 		}
@@ -212,7 +212,7 @@ func (s *documentInfo) serializeDate(b *strings.Builder) error {
 	}
 	str, err := s.date.ToXML()
 	if err != nil {
-		return wrapError(err, ErrNestedEntity, "Can't make document-info/date")
+		return wrapError(err, ErrNestedEntity, "Can't make %s/date", s.tag())
 	}
 	b.WriteString(str)
 	return nil
@@ -220,12 +220,12 @@ func (s *documentInfo) serializeDate(b *strings.Builder) error {
 
 func (s *documentInfo) serializeAuthors(b *strings.Builder) error {
 	if s.authors == nil || len(s.authors) == 0 {
-		return makeError(ErrEmptyField, "Empty required document-info/author")
+		return makeError(ErrEmptyField, "Empty required %s/author", s.tag())
 	}
 	for _, a := range s.authors {
 		str, err := a.ToXML()
 		if err != nil {
-			return wrapError(err, ErrNestedEntity, "Can't make document-info/author")
+			return wrapError(err, ErrNestedEntity, "Can't make %s/author", s.tag())
 		}
 		b.WriteString(str)
 	}
