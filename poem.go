@@ -35,12 +35,16 @@ import (
   <xs:attribute name="id" type="xs:ID" use="optional"/>
   <xs:attribute ref="xml:lang"/>
 </xs:complexType>*/
+//A poem
 type poem struct {
-	title     *title
+	//Poem title
+	title *title
+	//Poem epigraph(s), if any
 	epigraphs []*epigraph
-	items     []fb //stanzas and subtitles
-	authors   []string
-	date      *date
+	//Each poem should have at least one stanza. Stanzas are usually separated with empty lines by user agents.
+	items   []fb //stanzas and subtitles
+	authors []string
+	date    *date
 }
 
 func (s *poem) Date() *date {
@@ -117,19 +121,17 @@ func (s *poem) ToXML() (string, error) {
 	var b strings.Builder
 	fmt.Fprintf(&b, "<%s>\n", s.tag())
 	if err := s.makeTitle(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make %s/title", s.tag())
+		return "", err
 	}
 	if err := s.makeEpigraphs(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make %s/epigraph", s.tag())
+		return "", err
 	}
 	if err := s.makeStanzas(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make %s/stanza", s.tag())
+		return "", err
 	}
-	if err := s.makeAuthor(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make %s/text-author", s.tag())
-	}
+	s.makeAuthor(&b)
 	if err := s.makeDate(&b); err != nil {
-		return "", wrapError(err, ErrNestedEntity, "Can't make %s/date", s.tag())
+		return "", err
 	}
 	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
@@ -150,7 +152,7 @@ func (s *poem) makeEpigraphs(b *strings.Builder) error {
 	for _, ep := range s.epigraphs {
 		str, err := ep.ToXML()
 		if err != nil {
-			return err
+			return wrapError(err, ErrNestedEntity, "Can't make %s/epigraph", s.tag())
 		}
 		b.WriteString(str)
 	}
@@ -163,7 +165,7 @@ func (s *poem) makeTitle(b *strings.Builder) error {
 	}
 	str, err := s.title.ToXML()
 	if err != nil {
-		return err
+		return wrapError(err, ErrNestedEntity, "Can't make %s/title", s.tag())
 	}
 	b.WriteString(str)
 	return nil
@@ -173,12 +175,19 @@ func (s *poem) makeStanzas(b *strings.Builder) error {
 	if s.items == nil || len(s.items) == 0 {
 		return makeError(ErrEmptyField, "Empty required %s/stanza", s.tag())
 	}
+	ok := false
 	for _, i := range s.items {
+		if !ok {
+			_, ok = i.(*stanza)
+		}
 		str, err := i.ToXML()
 		if err != nil {
-			return err
+			return wrapError(err, ErrNestedEntity, "Can't make %s/%s", s.tag(), i.tag())
 		}
 		b.WriteString(str)
+	}
+	if !ok {
+		return makeError(ErrEmptyField, "Each poem should have at least one stanza")
 	}
 	return nil
 }
@@ -197,7 +206,7 @@ func (s *poem) makeDate(b *strings.Builder) error {
 	}
 	str, err := s.date.ToXML()
 	if err != nil {
-		return err
+		return wrapError(err, ErrNestedEntity, "Can't make %s/%s", s.tag(), s.date.tag())
 	}
 	b.WriteString(str)
 	return nil
