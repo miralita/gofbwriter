@@ -7,9 +7,9 @@ import (
 
 //A citation with an optional citation author at the end
 type cite struct {
-	id         string
-	items      []fb
-	textAuthor string
+	id          string
+	items       []fb
+	textAuthors []string
 }
 
 func (s *cite) ID() string {
@@ -20,12 +20,16 @@ func (s *cite) SetID(id string) {
 	s.id = id
 }
 
-func (s *cite) TextAuthor() string {
-	return s.textAuthor
+func (s *cite) TextAuthors() []string {
+	return s.textAuthors
 }
 
-func (s *cite) SetTextAuthor(textAuthor string) {
-	s.textAuthor = textAuthor
+func (s *cite) AddTextAuthor(textAuthor string) {
+	if s.textAuthors == nil {
+		s.textAuthors = []string{textAuthor}
+	} else {
+		s.textAuthors = append(s.textAuthors, textAuthor)
+	}
 }
 
 func (s *cite) AddParagraph(par string) *p {
@@ -97,6 +101,7 @@ func (s *cite) ToXML() (string, error) {
 			b.WriteString(str)
 		}
 	}
+	b.WriteString(makeTagMulti("text-author", s.textAuthors, true))
 
 	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
