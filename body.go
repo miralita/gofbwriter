@@ -1,10 +1,5 @@
 package gofbwriter
 
-import (
-	"fmt"
-	"strings"
-)
-
 //Main content of the book, multiple bodies are used for additional information, like footnotes, that do not appear in the main book flow (extended from this class). The first body is presented to the reader by default, and content in the other bodies should be accessible by hyperlinks.
 type body struct {
 	b         *builder
@@ -90,70 +85,66 @@ func (s *body) ToXML() (string, error) {
 	if s.sections == nil || len(s.sections) == 0 {
 		return "", makeError(ErrEmptyField, "Empty required field %s/section", s.tag())
 	}
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s", s.tag())
-	if s.name != "" {
-		fmt.Fprintf(&b, " %s", makeAttribute("name", s.name))
-	}
-	b.WriteString(">\n")
-	if err := s.serializeImage(&b); err != nil {
+	b := s.builder()
+	b.openTagAttr(s.tag(), map[string]string{"name": s.name}, false)
+	if err := s.serializeImage(); err != nil {
 		return "", err
 	}
-	if err := s.serializeTitle(&b); err != nil {
+	if err := s.serializeTitle(); err != nil {
 		return "", err
 	}
-	if err := s.serializeEpigraphs(&b); err != nil {
+	if err := s.serializeEpigraphs(); err != nil {
 		return "", err
 	}
-	if err := s.serializeSections(&b); err != nil {
+	if err := s.serializeSections(); err != nil {
 		return "", err
 	}
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 
-func (s *body) serializeImage(b *strings.Builder) error {
+func (s *body) serializeImage() error {
 	if s.image != nil {
 		i, err := s.image.ToXML()
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/image", s.tag())
 		}
-		b.WriteString(i)
+		s.builder().WriteString(i)
 	}
 	return nil
 }
 
-func (s *body) serializeTitle(b *strings.Builder) error {
+func (s *body) serializeTitle() error {
 	if s.title != nil {
 		t, err := s.title.ToXML()
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/title", s.tag())
 		}
-		b.WriteString(t)
+		s.builder().WriteString(t)
 	}
 	return nil
 }
 
-func (s *body) serializeEpigraphs(b *strings.Builder) error {
+func (s *body) serializeEpigraphs() error {
 	if s.epigraphs != nil && len(s.epigraphs) > 0 {
 		for _, ep := range s.epigraphs {
 			str, err := ep.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make %s/epigraph", s.tag())
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil
 }
 
-func (s *body) serializeSections(b *strings.Builder) error {
+func (s *body) serializeSections() error {
 	for _, sec := range s.sections {
 		str, err := sec.ToXML()
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/section", s.tag())
 		}
-		b.WriteString(str)
+		s.builder().WriteString(str)
 	}
 	return nil
 }

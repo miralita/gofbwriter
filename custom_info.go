@@ -1,10 +1,5 @@
 package gofbwriter
 
-import (
-	"fmt"
-	"strings"
-)
-
 type customInfo struct {
 	b        *builder
 	info     string
@@ -25,10 +20,10 @@ func (s *customInfo) ToXML() (string, error) {
 	if s.infoType == "" {
 		return "", makeError(ErrEmptyAttribute, "Empty attribute %s for custom-info", s.tag())
 	}
-	var b strings.Builder
-	b.WriteString(fmt.Sprintf("<%s %s>\n", s.tag(), makeAttribute("info-type", s.infoType)))
+	b := s.builder()
+	b.openTagAttr(s.tag(), map[string]string{"info-type": s.infoType}, false)
 	b.WriteString(s.info)
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 

@@ -2,7 +2,6 @@ package gofbwriter
 
 import (
 	"fmt"
-	"strings"
 )
 
 //An epigraph
@@ -94,8 +93,8 @@ func (s *epigraph) ToXML() (string, error) {
 	if (s.items == nil || len(s.items) == 0) && (s.textAuthors == nil || len(s.textAuthors) == 0) {
 		return fmt.Sprintf("<%s />\n", s.tag()), nil
 	}
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s>\n", s.tag())
+	b := s.builder()
+	b.openTag(s.tag())
 	if s.items != nil {
 		for _, i := range s.items {
 			str, err := i.ToXML()
@@ -107,10 +106,10 @@ func (s *epigraph) ToXML() (string, error) {
 	}
 	if s.textAuthors != nil {
 		for _, i := range s.textAuthors {
-			b.WriteString(makeTag("text-author", sanitizeString(i)))
+			s.builder().makeTag("text-author", sanitizeString(i))
 		}
 	}
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 

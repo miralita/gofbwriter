@@ -1,10 +1,5 @@
 package gofbwriter
 
-import (
-	"fmt"
-	"strings"
-)
-
 //Information about a single author
 type author struct {
 	b          *builder
@@ -100,15 +95,15 @@ func (s *author) ToXML() (string, error) {
 	} else if s.firstName == "" && s.lastName == "" {
 		return "", makeError(ErrEmptyField, "Empty required field: %s/nickname", s.tag())
 	}
-	var b strings.Builder
-	openTag(&b, s.tag(), nil, false)
-	makeTag(&b, "first-name", s.firstName)
-	makeTags(&b, "middle-name", s.middleName, true)
-	makeTag(&b, "last-name", s.lastName)
-	makeTags(&b, "nickname", s.nickname, true)
-	makeTags(&b, "home-page", s.homePage, true)
-	makeTags(&b, "email", s.email, true)
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b := s.builder()
+	b.openTag(s.tag())
+	b.makeTag("first-name", s.firstName)
+	b.makeTags("middle-name", s.middleName, true)
+	b.makeTag("last-name", s.lastName)
+	b.makeTags("nickname", s.nickname, true)
+	b.makeTags("home-page", s.homePage, true)
+	b.makeTags("email", s.email, true)
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 

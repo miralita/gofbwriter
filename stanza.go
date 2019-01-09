@@ -1,10 +1,5 @@
 package gofbwriter
 
-import (
-	"fmt"
-	"strings"
-)
-
 /*<xs:element name="stanza">
   <xs:annotation>
     <xs:documentation>Each poem should have at least one stanza. Stanzas are usually separated with empty lines by user agents.</xs:documentation>
@@ -70,8 +65,8 @@ func (s *stanza) ToXML() (string, error) {
 	if s.lines == nil || len(s.lines) == 0 {
 		return "", makeError(ErrEmptyField, "Empty required %s/v", s.tag())
 	}
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s>\n", s.tag())
+	b := s.builder()
+	b.openTag(s.tag())
 	if s.title != nil {
 		str, err := s.ToXML()
 		if err != nil {
@@ -79,11 +74,9 @@ func (s *stanza) ToXML() (string, error) {
 		}
 		b.WriteString(str)
 	}
-	if s.subtitle != "" {
-		b.WriteString(makeTag("subtitle", sanitizeString(s.subtitle)))
-	}
-	b.WriteString(makeTags("v", s.lines, true))
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.makeTag("subtitle", sanitizeString(s.subtitle))
+	b.makeTags("v", s.lines, true)
+	b.closeTag(s.tag())
 
 	return b.String(), nil
 }

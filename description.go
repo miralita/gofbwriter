@@ -1,10 +1,5 @@
 package gofbwriter
 
-import (
-	"fmt"
-	"strings"
-)
-
 type description struct {
 	b *builder
 	//Generic information about the book
@@ -96,57 +91,57 @@ func (s *description) CreateTitleInfo() *titleInfo {
 }
 
 func (s *description) ToXML() (string, error) {
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s>\n", s.tag())
-	if err := s.serializeTitleInfo(&b); err != nil {
+	b := s.builder()
+	b.openTag(s.tag())
+	if err := s.serializeTitleInfo(); err != nil {
 		return "", err
 	}
-	if err := s.serializeSrcTitleInfo(&b); err != nil {
+	if err := s.serializeSrcTitleInfo(); err != nil {
 		return "", err
 	}
-	if err := s.serializeDocumentInfo(&b); err != nil {
+	if err := s.serializeDocumentInfo(); err != nil {
 		return "", err
 	}
-	if err := s.serializePublishInfo(&b); err != nil {
+	if err := s.serializePublishInfo(); err != nil {
 		return "", err
 	}
-	if err := s.serializeCustomInfo(&b); err != nil {
+	if err := s.serializeCustomInfo(); err != nil {
 		return "", err
 	}
-	if err := s.serializeOutput(&b); err != nil {
+	if err := s.serializeOutput(); err != nil {
 		return "", err
 	}
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 
-func (s *description) serializeOutput(b *strings.Builder) error {
+func (s *description) serializeOutput() error {
 	if s.output != nil {
 		for _, o := range s.output {
 			str, err := o.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make %s/output", s.tag())
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil
 }
 
-func (s *description) serializeCustomInfo(b *strings.Builder) error {
+func (s *description) serializeCustomInfo() error {
 	if s.customInfo != nil {
 		for _, i := range s.customInfo {
 			str, err := i.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make %s/custom-info", s.tag())
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil
 }
 
-func (s *description) serializePublishInfo(b *strings.Builder) error {
+func (s *description) serializePublishInfo() error {
 	if s.publishInfo == nil {
 		return makeError(ErrEmptyField, "Empty required %s/publish-info", s.tag())
 	}
@@ -154,11 +149,11 @@ func (s *description) serializePublishInfo(b *strings.Builder) error {
 	if err != nil {
 		return wrapError(err, ErrNestedEntity, "Can't make %s/publish-info", s.tag())
 	}
-	b.WriteString(str)
+	s.builder().WriteString(str)
 	return nil
 }
 
-func (s *description) serializeDocumentInfo(b *strings.Builder) error {
+func (s *description) serializeDocumentInfo() error {
 	if s.documentInfo == nil {
 		return makeError(ErrEmptyField, "Empty required %s/document-info", s.tag())
 	}
@@ -166,22 +161,22 @@ func (s *description) serializeDocumentInfo(b *strings.Builder) error {
 	if err != nil {
 		return wrapError(err, ErrNestedEntity, "Can't make %s/document-info", s.tag())
 	}
-	b.WriteString(str)
+	s.builder().WriteString(str)
 	return nil
 }
 
-func (s *description) serializeSrcTitleInfo(b *strings.Builder) error {
+func (s *description) serializeSrcTitleInfo() error {
 	if s.srcTitleInfo != nil {
 		str, err := s.srcTitleInfo.ToXML()
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/src-title-info", s.tag())
 		}
-		b.WriteString(str)
+		s.builder().WriteString(str)
 	}
 	return nil
 }
 
-func (s *description) serializeTitleInfo(b *strings.Builder) error {
+func (s *description) serializeTitleInfo() error {
 	if s.titleInfo == nil {
 		return makeError(ErrEmptyField, "Empty required %s/title-info", s.tag())
 	}
@@ -189,7 +184,7 @@ func (s *description) serializeTitleInfo(b *strings.Builder) error {
 	if err != nil {
 		return wrapError(err, ErrNestedEntity, "Can't make %s/title-info", s.tag())
 	}
-	b.WriteString(str)
+	s.builder().WriteString(str)
 	return nil
 }
 

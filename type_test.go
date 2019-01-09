@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func testInterface(t *testing.T) {
+func TestInterface(t *testing.T) {
 	var v fb
 	v = &annotation{}
 	t.Log(v.tag())

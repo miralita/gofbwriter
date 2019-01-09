@@ -2,7 +2,6 @@ package gofbwriter
 
 import (
 	"fmt"
-	"strings"
 )
 
 //A title, used in sections, poems and body elements
@@ -38,8 +37,8 @@ func (s *title) ToXML() (string, error) {
 	if s.items == nil || len(s.items) == 0 {
 		return fmt.Sprintf("<%s />\n", s.tag()), nil
 	}
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s>\n", s.tag())
+	b := s.builder()
+	b.openTag(s.tag())
 	for _, i := range s.items {
 		str, err := i.ToXML()
 		if err != nil {
@@ -47,7 +46,7 @@ func (s *title) ToXML() (string, error) {
 		}
 		b.WriteString(str)
 	}
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 

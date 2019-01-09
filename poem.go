@@ -1,8 +1,6 @@
 package gofbwriter
 
 import (
-	"fmt"
-	"strings"
 	"time"
 )
 
@@ -77,8 +75,12 @@ func (s *poem) Title() *title {
 
 type subtitle string
 
+func (s subtitle) builder() *builder {
+	return &builder{}
+}
+
 func (s subtitle) ToXML() (string, error) {
-	return makeTag(s.tag(), sanitizeString(string(s))), nil
+	return s.builder().makeTag(s.tag(), sanitizeString(string(s))).String(), nil
 }
 
 func (s subtitle) tag() string {
@@ -126,22 +128,22 @@ func (s *poem) CreateEpigraph() *epigraph {
 }
 
 func (s *poem) ToXML() (string, error) {
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s>\n", s.tag())
-	if err := s.makeTitle(&b); err != nil {
+	b := s.builder()
+	b.openTag(s.tag())
+	if err := s.makeTitle(); err != nil {
 		return "", err
 	}
-	if err := s.makeEpigraphs(&b); err != nil {
+	if err := s.makeEpigraphs(); err != nil {
 		return "", err
 	}
-	if err := s.makeStanzas(&b); err != nil {
+	if err := s.makeStanzas(); err != nil {
 		return "", err
 	}
-	s.makeAuthor(&b)
-	if err := s.makeDate(&b); err != nil {
+	s.makeAuthor()
+	if err := s.makeDate(); err != nil {
 		return "", err
 	}
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 
@@ -153,7 +155,7 @@ func (s *poem) addItem(item fb) {
 	}
 }
 
-func (s *poem) makeEpigraphs(b *strings.Builder) error {
+func (s *poem) makeEpigraphs() error {
 	if s.epigraphs == nil || len(s.epigraphs) == 0 {
 		return nil
 	}
@@ -162,12 +164,12 @@ func (s *poem) makeEpigraphs(b *strings.Builder) error {
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/epigraph", s.tag())
 		}
-		b.WriteString(str)
+		s.builder().WriteString(str)
 	}
 	return nil
 }
 
-func (s *poem) makeTitle(b *strings.Builder) error {
+func (s *poem) makeTitle() error {
 	if s.title == nil {
 		return makeError(ErrEmptyField, "Empty required %s/title", s.tag())
 	}
@@ -175,11 +177,11 @@ func (s *poem) makeTitle(b *strings.Builder) error {
 	if err != nil {
 		return wrapError(err, ErrNestedEntity, "Can't make %s/title", s.tag())
 	}
-	b.WriteString(str)
+	s.builder().WriteString(str)
 	return nil
 }
 
-func (s *poem) makeStanzas(b *strings.Builder) error {
+func (s *poem) makeStanzas() error {
 	if s.items == nil || len(s.items) == 0 {
 		return makeError(ErrEmptyField, "Empty required %s/stanza", s.tag())
 	}
@@ -192,7 +194,7 @@ func (s *poem) makeStanzas(b *strings.Builder) error {
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/%s", s.tag(), i.tag())
 		}
-		b.WriteString(str)
+		s.builder().WriteString(str)
 	}
 	if !ok {
 		return makeError(ErrEmptyField, "Each poem should have at least one stanza")
@@ -200,15 +202,15 @@ func (s *poem) makeStanzas(b *strings.Builder) error {
 	return nil
 }
 
-func (s *poem) makeAuthor(b *strings.Builder) error {
+func (s *poem) makeAuthor() error {
 	if s.authors == nil {
 		return nil
 	}
-	b.WriteString(makeTags("text-author", s.authors, true))
+	s.builder().makeTags("text-author", s.authors, true)
 	return nil
 }
 
-func (s *poem) makeDate(b *strings.Builder) error {
+func (s *poem) makeDate() error {
 	if s.date == nil {
 		return nil
 	}
@@ -216,7 +218,7 @@ func (s *poem) makeDate(b *strings.Builder) error {
 	if err != nil {
 		return wrapError(err, ErrNestedEntity, "Can't make %s/%s", s.tag(), s.date.tag())
 	}
-	b.WriteString(str)
+	s.builder().WriteString(str)
 	return nil
 }
 

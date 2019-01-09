@@ -2,7 +2,6 @@ package gofbwriter
 
 import (
 	"fmt"
-	"strings"
 )
 
 //Information about some paper/outher published document, that was used as a source of this xml document
@@ -86,33 +85,25 @@ func (s *publishInfo) SetBookName(bookName string) {
 }
 
 func (s *publishInfo) ToXML() (string, error) {
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s>\n", s.tag())
-	if s.bookName != "" {
-		b.WriteString(makeTag("book-name", sanitizeString(s.bookName)))
-	}
-	if s.publisher != "" {
-		b.WriteString(makeTag("publisher", sanitizeString(s.publisher)))
-	}
-	if s.city != "" {
-		b.WriteString(makeTag("city", sanitizeString(s.city)))
-	}
+	b := s.builder()
+	b.openTag(s.tag())
+	b.makeTag("book-name", sanitizeString(s.bookName))
+	b.makeTag("publisher", sanitizeString(s.publisher))
+	b.makeTag("city", sanitizeString(s.city))
 	if s.year != 0 {
-		b.WriteString(makeTag("year", fmt.Sprintf("%d", s.year)))
+		b.makeTag("year", fmt.Sprintf("%d", s.year))
 	}
-	if s.isbn != "" {
-		b.WriteString(makeTag("isbn", sanitizeString(s.isbn)))
-	}
-	if s.city != "" {
+	b.makeTag("isbn", sanitizeString(s.isbn))
+	if s.sequence != nil {
 		for _, seq := range s.sequence {
 			str, err := seq.ToXML()
 			if err != nil {
-				return "", wrapError(err, ErrNestedEntity, "Can't make %s/sequence", s.tag())
+				return "", wrapError(err, ErrNestedEntity, "Can't make %s/%s", s.tag(), seq.tag())
 			}
 			b.WriteString(str)
 		}
 	}
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 

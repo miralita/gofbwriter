@@ -2,8 +2,6 @@ package gofbwriter
 
 import (
 	"encoding/base64"
-	"fmt"
-	"strings"
 )
 
 //Any binary data that is required for the presentation of this book in base64 format. Currently only images are used.
@@ -34,10 +32,10 @@ func (s *binary) ID() string {
 }
 
 func (s *binary) ToXML() (string, error) {
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s %s %s>", s.tag(), makeAttribute("id", s.id), makeAttribute("content-type", s.contentType))
+	b := s.builder()
+	b.openTagAttr(s.tag(), map[string]string{"id": s.id, "content-type": s.contentType}, false)
 	b.WriteString(base64.StdEncoding.EncodeToString(s.data))
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 

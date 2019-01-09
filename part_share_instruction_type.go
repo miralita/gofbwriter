@@ -1,10 +1,5 @@
 package gofbwriter
 
-import (
-	"fmt"
-	"strings"
-)
-
 //DocGenerationInstructionType - List of instructions to process sections (allow|deny|require)
 type DocGenerationInstructionType int
 
@@ -58,21 +53,12 @@ func (s *partShareInstructionType) ToXML() (string, error) {
 	if s.include == 0 {
 		return "", makeError(ErrEmptyAttribute, "Empty required attribute %s/include", s.tag())
 	}
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s", s.tag())
-	if s.linkType != "" {
-		b.WriteString(" ")
-		b.WriteString(makeAttribute("type", s.linkType))
-	}
-	b.WriteString(" ")
-	b.WriteString(makeAttribute("href", s.href))
-	b.WriteString(" ")
 	str, err := s.include.Value()
 	if err != nil {
 		return "", wrapError(err, ErrNestedEntity, "Can't make %s/include attribute", s.tag())
 	}
-	b.WriteString(makeAttribute("include", str))
-	b.WriteString(" />\n")
+	b := s.builder()
+	b.makeTagAttr(s.tag(), "", map[string]string{"type": s.linkType, "href": s.href, "include": str}, false)
 	return b.String(), nil
 }
 

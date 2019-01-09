@@ -2,7 +2,6 @@ package gofbwriter
 
 import (
 	"fmt"
-	"strings"
 )
 
 //Root element
@@ -67,7 +66,7 @@ func (s *book) CreateStylesheet(ctype, data string) (*stylesheet, error) {
 	if ctype == "" {
 		ctype = "text/css"
 	}
-	st := &stylesheet{ctype, data, s}
+	st := &stylesheet{&builder{}, ctype, data, s}
 	if s.stylesheets == nil {
 		s.stylesheets = []*stylesheet{st}
 	} else {
@@ -89,56 +88,56 @@ func (s *book) CreateDescription() *description {
 }
 
 func (s *book) ToXML() (string, error) {
-	var b strings.Builder
-	fmt.Fprintf(&b, `<?xml version="1.0" encoding="UTF-8"?>
+	b := s.builder()
+	fmt.Fprintf(b, `<?xml version="1.0" encoding="UTF-8"?>
 <%s xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
 `, s.tag())
-	if err := s.makeStylesheets(&b); err != nil {
+	if err := s.makeStylesheets(); err != nil {
 		return "", err
 	}
-	if err := s.makeDescription(&b); err != nil {
+	if err := s.makeDescription(); err != nil {
 		return "", err
 	}
-	if err := s.makeBody(&b); err != nil {
+	if err := s.makeBody(); err != nil {
 		return "", err
 	}
-	if err := s.makeNotes(&b); err != nil {
+	if err := s.makeNotes(); err != nil {
 		return "", err
 	}
-	if err := s.makeBinary(&b); err != nil {
+	if err := s.makeBinary(); err != nil {
 		return "", err
 	}
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 
-func (s *book) makeBinary(b *strings.Builder) error {
+func (s *book) makeBinary() error {
 	if s.binary != nil && len(s.binary) > 0 {
 		for _, bin := range s.binary {
 			str, err := bin.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make %s/binary", s.tag())
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil
 }
 
-func (s *book) makeNotes(b *strings.Builder) error {
+func (s *book) makeNotes() error {
 	if s.notes != nil && len(s.notes) > 0 {
 		for _, n := range s.notes {
 			str, err := n.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make %s/body (notes)", s.tag())
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil
 }
 
-func (s *book) makeBody(b *strings.Builder) error {
+func (s *book) makeBody() error {
 	if s.body == nil {
 		return makeError(ErrEmptyField, "Empty required %s/body", s.tag())
 	}
@@ -146,11 +145,11 @@ func (s *book) makeBody(b *strings.Builder) error {
 	if err != nil {
 		return wrapError(err, ErrNestedEntity, "Can't make %s/body", s.tag())
 	}
-	b.WriteString(str)
+	s.builder().WriteString(str)
 	return nil
 }
 
-func (s *book) makeDescription(b *strings.Builder) error {
+func (s *book) makeDescription() error {
 	if s.description == nil {
 		return makeError(ErrEmptyField, "Empty required %s/description", s.tag())
 	}
@@ -158,18 +157,18 @@ func (s *book) makeDescription(b *strings.Builder) error {
 	if err != nil {
 		return wrapError(err, ErrNestedEntity, "Can't make %s/description", s.tag())
 	}
-	b.WriteString(str)
+	s.builder().WriteString(str)
 	return nil
 }
 
-func (s *book) makeStylesheets(b *strings.Builder) error {
+func (s *book) makeStylesheets() error {
 	if s.stylesheets != nil && len(s.stylesheets) > 0 {
 		for _, st := range s.stylesheets {
 			str, err := st.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make FictionBook/stylesheet")
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil

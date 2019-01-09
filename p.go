@@ -1,9 +1,5 @@
 package gofbwriter
 
-import (
-	"fmt"
-)
-
 //A basic paragraph, may include simple formatting inside
 type p struct {
 	b       *builder
@@ -39,7 +35,8 @@ func (s *empty) builder() *builder {
 }
 
 func (s *empty) ToXML() (string, error) {
-	return fmt.Sprintf("<%s />\n", s.tag()), nil
+	s.builder().makeTagAttr(s.tag(), "", nil, false)
+	return s.builder().String(), nil
 }
 
 func (s *empty) tag() string {

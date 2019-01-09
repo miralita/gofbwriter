@@ -1,10 +1,5 @@
 package gofbwriter
 
-import (
-	"fmt"
-	"strings"
-)
-
 type inlineImage struct {
 	b     *builder
 	alt   string
@@ -58,45 +53,13 @@ func (i *image) SetTitle(title string) {
 }
 
 func (i *inlineImage) ToXML() (string, error) {
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s", i.tag())
-	if i.ctype != "" {
-		b.WriteString(" ")
-		b.WriteString(makeAttribute("ctype", i.ctype))
-	}
-	if i.alt != "" {
-		b.WriteString(" ")
-		b.WriteString(makeAttribute("alt", i.alt))
-	}
-	if i.href != "" {
-		b.WriteString(" ")
-		b.WriteString(makeAttribute("href", i.href))
-	}
-	b.WriteString(" />")
-	return b.String(), nil
+	i.builder().makeTagAttr(i.tag(), "", map[string]string{"ctype": i.ctype, "alt": i.alt, "href": i.href}, false)
+	return i.builder().String(), nil
 }
 
 func (i *image) ToXML() (string, error) {
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s", i.tag())
-	if i.title != "" {
-		b.WriteString(" ")
-		b.WriteString(makeAttribute("title", i.title))
-	}
-	if i.ctype != "" {
-		b.WriteString(" ")
-		b.WriteString(makeAttribute("ctype", i.ctype))
-	}
-	if i.alt != "" {
-		b.WriteString(" ")
-		b.WriteString(makeAttribute("alt", i.alt))
-	}
-	if i.href != "" {
-		b.WriteString(" ")
-		b.WriteString(makeAttribute("href", i.href))
-	}
-	b.WriteString(" />")
-	return b.String(), nil
+	i.builder().makeTagAttr(i.tag(), "", map[string]string{"ctype": i.ctype, "alt": i.alt, "href": i.href, "title": i.title}, false)
+	return i.builder().String(), nil
 }
 
 func (i *inlineImage) tag() string {

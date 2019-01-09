@@ -15,16 +15,17 @@ type builder struct {
 	strings.Builder
 }
 
-func (b *builder) makeTag(tagName, tagValue string) {
+func (b *builder) makeTag(tagName, tagValue string) *builder {
 	if tagValue == "" {
-		return
+		return b
 	}
 	fmt.Fprintf(b, "<%s>%s</%s>\n", tagName, tagValue, tagName)
+	return b
 }
 
-func (b *builder) makeTags(tagName string, tagValue []string, sanitize bool) {
+func (b *builder) makeTags(tagName string, tagValue []string, sanitize bool) *builder {
 	if tagValue == nil || len(tagValue) == 0 {
-		return
+		return b
 	}
 	for _, s := range tagValue {
 		if sanitize {
@@ -32,9 +33,10 @@ func (b *builder) makeTags(tagName string, tagValue []string, sanitize bool) {
 		}
 		b.makeTag(tagName, s)
 	}
+	return b
 }
 
-func (b *builder) openTag(tagName string, attrs map[string]string, sanitize bool) {
+func (b *builder) openTagAttr(tagName string, attrs map[string]string, sanitize bool) *builder {
 	fmt.Fprintf(b, "<%s", tagName)
 	if attrs != nil {
 		for k, v := range attrs {
@@ -47,10 +49,38 @@ func (b *builder) openTag(tagName string, attrs map[string]string, sanitize bool
 		}
 	}
 	fmt.Fprint(b, ">\n")
+	return b
 }
 
-func (b *builder) closeTag(tagName string) {
+func (b *builder) makeTagAttr(tagName string, value string, attrs map[string]string, sanitize bool) *builder {
+	fmt.Fprintf(b, "<%s", tagName)
+	if attrs != nil {
+		for k, v := range attrs {
+			if v != "" {
+				if sanitize {
+					v = sanitizeString(v)
+				}
+				fmt.Fprintf(b, " %s=\"%s\"", k, v)
+			}
+		}
+	}
+	if value != "" {
+		fmt.Fprint(b, value)
+		fmt.Fprint(b, ">\n")
+	} else {
+		fmt.Fprint(b, " />\n")
+	}
+	return b
+}
+
+func (b *builder) openTag(tagName string) *builder {
+	fmt.Fprintf(b, "<%s>\n", tagName)
+	return b
+}
+
+func (b *builder) closeTag(tagName string) *builder {
 	fmt.Fprintf(b, "</%s>\n", tagName)
+	return b
 }
 
 func sanitizeString(str string) string {
@@ -75,6 +105,7 @@ func sanitizeString(str string) string {
 	return str
 }
 
-func (b *builder) makeAttribute(attrName, attrValue string) {
+func (b *builder) makeAttribute(attrName, attrValue string) *builder {
 	fmt.Fprintf(b, `%s="%s"`, attrName, sanitizeString(attrValue))
+	return b
 }

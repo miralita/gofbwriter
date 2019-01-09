@@ -1,10 +1,5 @@
 package gofbwriter
 
-import (
-	"fmt"
-	"strings"
-)
-
 type stylesheet struct {
 	b     *builder
 	ctype string
@@ -25,12 +20,10 @@ func (s *stylesheet) Set(ctype, data string) {
 }
 
 func (s *stylesheet) ToXML() (string, error) {
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s", s.tag())
-	if s.ctype != "" {
-		fmt.Fprintf(&b, ` type="%s"`, s.ctype)
-	}
-	fmt.Fprintf(&b, ">\n%s\n</%s>\n", s.data, s.tag())
+	b := s.builder()
+	b.openTagAttr(s.tag(), map[string]string{"type": s.ctype}, false)
+	b.WriteString(s.data)
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 

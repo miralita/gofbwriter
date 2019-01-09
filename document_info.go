@@ -3,7 +3,6 @@ package gofbwriter
 import (
 	"fmt"
 	"github.com/satori/go.uuid"
-	"strings"
 	"time"
 )
 
@@ -142,79 +141,79 @@ func (s *documentInfo) AddAuthor(docAuthor *author) {
 }
 
 func (s *documentInfo) ToXML() (string, error) {
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s>\n", s.tag())
-	if err := s.serializeAuthors(&b); err != nil {
+	b := s.builder()
+	b.openTag(s.tag())
+	if err := s.serializeAuthors(); err != nil {
 		return "", err
 	}
 	if s.programUsed != "" {
-		makeTag(&b, "program-used", sanitizeString(s.programUsed))
+		b.makeTag("program-used", sanitizeString(s.programUsed))
 	}
-	if err := s.serializeDate(&b); err != nil {
+	if err := s.serializeDate(); err != nil {
 		return "", err
 	}
 	if s.srcOcr != "" {
-		makeTag(&b, "src-ocr", sanitizeString(s.srcOcr))
+		b.makeTag("src-ocr", sanitizeString(s.srcOcr))
 	}
-	s.serializeID(&b)
+	s.serializeID()
 	if s.version == 0 {
 		s.version = 1.0
 	}
-	makeTag(&b, "version", fmt.Sprintf("%0.4f", s.version))
-	if err := s.serializeHistory(&b); err != nil {
+	b.makeTag("version", fmt.Sprintf("%0.4f", s.version))
+	if err := s.serializeHistory(); err != nil {
 		return "", err
 	}
-	if err := s.serializePublisher(&b); err != nil {
+	if err := s.serializePublisher(); err != nil {
 		return "", err
 	}
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 
-func (s *documentInfo) serializePublisher(b *strings.Builder) error {
+func (s *documentInfo) serializePublisher() error {
 	if s.publishers != nil {
 		for _, h := range s.publishers {
 			str, err := h.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make %s/publisher", s.tag())
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil
 }
 
-func (s *documentInfo) serializeHistory(b *strings.Builder) error {
+func (s *documentInfo) serializeHistory() error {
 	if s.history != nil {
 		for _, h := range s.history {
 			str, err := h.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make %s/history", s.tag())
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil
 }
 
-func (s *documentInfo) serializeID(b *strings.Builder) {
+func (s *documentInfo) serializeID() {
 	if s.id == nil {
 		u := uuid.NewV4()
 		s.id = &u
 	}
-	b.WriteString(makeTag("id", s.id.String()))
+	s.builder().makeTag("id", s.id.String())
 }
 
-func (s *documentInfo) serializeSrcUrls(b *strings.Builder) error {
+func (s *documentInfo) serializeSrcUrls() error {
 	if s.srcUrls != nil {
 		for _, url := range s.srcUrls {
-			b.WriteString(makeTag("src-url", sanitizeString(url)))
+			s.builder().makeTag("src-url", sanitizeString(url))
 		}
 	}
 	return nil
 }
 
-func (s *documentInfo) serializeDate(b *strings.Builder) error {
+func (s *documentInfo) serializeDate() error {
 	if s.date == nil {
 		s.SetDate(time.Now())
 	}
@@ -222,11 +221,11 @@ func (s *documentInfo) serializeDate(b *strings.Builder) error {
 	if err != nil {
 		return wrapError(err, ErrNestedEntity, "Can't make %s/date", s.tag())
 	}
-	b.WriteString(str)
+	s.builder().WriteString(str)
 	return nil
 }
 
-func (s *documentInfo) serializeAuthors(b *strings.Builder) error {
+func (s *documentInfo) serializeAuthors() error {
 	if s.authors == nil || len(s.authors) == 0 {
 		return makeError(ErrEmptyField, "Empty required %s/author", s.tag())
 	}
@@ -235,7 +234,7 @@ func (s *documentInfo) serializeAuthors(b *strings.Builder) error {
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/author", s.tag())
 		}
-		b.WriteString(str)
+		s.builder().WriteString(str)
 	}
 	return nil
 }

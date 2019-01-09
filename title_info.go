@@ -1,7 +1,6 @@
 package gofbwriter
 
 import (
-	"fmt"
 	"strings"
 	"time"
 )
@@ -174,136 +173,132 @@ func (s *titleInfo) CreateAuthor(firstName, middleName, lastName string) *author
 }
 
 func (s *titleInfo) ToXML() (string, error) { // nolint: gocyclo
-	var b strings.Builder
-	fmt.Fprintf(&b, "<%s>\n", s.tag())
+	b := s.builder()
+	b.openTag(s.tag())
 
-	if err := s.serializeGenres(&b); err != nil {
+	if err := s.serializeGenres(); err != nil {
 		return "", err
 	}
-	if err := s.serializeAuthors(&b); err != nil {
+	if err := s.serializeAuthors(); err != nil {
 		return "", err
 	}
-	if err := s.serializeBookTitle(&b); err != nil {
+	if err := s.serializeBookTitle(); err != nil {
 		return "", err
 	}
-	if err := s.serializeAnnotation(&b); err != nil {
+	if err := s.serializeAnnotation(); err != nil {
 		return "", err
 	}
-	_ = s.serializeKeywords(&b)
-	if err := s.serializeDate(&b); err != nil {
+	_ = s.serializeKeywords()
+	if err := s.serializeDate(); err != nil {
 		return "", err
 	}
-	if err := s.serializeCoverpage(&b); err != nil {
+	if err := s.serializeCoverpage(); err != nil {
 		return "", err
 	}
-	if err := s.serializeLang(&b); err != nil {
+	if err := s.serializeLang(); err != nil {
 		return "", err
 	}
-	_ = s.serializeSrcLang(&b)
-	if err := s.serializeTranslators(&b); err != nil {
+	_ = s.serializeSrcLang()
+	if err := s.serializeTranslators(); err != nil {
 		return "", err
 	}
-	if err := s.serializeSequences(&b); err != nil {
+	if err := s.serializeSequences(); err != nil {
 		return "", err
 	}
-	fmt.Fprintf(&b, "</%s>\n", s.tag())
+	b.closeTag(s.tag())
 	return b.String(), nil
 }
 
-func (s *titleInfo) serializeSequences(b *strings.Builder) error {
+func (s *titleInfo) serializeSequences() error {
 	if s.sequences != nil {
 		for _, tr := range s.sequences {
 			str, err := tr.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make %s/sequence", s.tag())
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil
 }
 
-func (s *titleInfo) serializeTranslators(b *strings.Builder) error {
+func (s *titleInfo) serializeTranslators() error {
 	if s.translators != nil {
 		for _, tr := range s.translators {
 			str, err := tr.ToXML()
 			if err != nil {
 				return wrapError(err, ErrNestedEntity, "Can't make title-info/translator")
 			}
-			b.WriteString(str)
+			s.builder().WriteString(str)
 		}
 	}
 	return nil
 }
 
-func (s *titleInfo) serializeSrcLang(b *strings.Builder) error {
-	if s.lang != "" {
-		b.WriteString(makeTag("src-lang", s.lang))
-	}
+func (s *titleInfo) serializeSrcLang() error {
+	s.builder().makeTag("src-lang", s.lang)
 	return nil
 }
 
-func (s *titleInfo) serializeLang(b *strings.Builder) error {
+func (s *titleInfo) serializeLang() error {
 	if s.lang == "" {
 		return makeError(ErrEmptyField, "Empty required %s/lang", s.tag())
 	}
-	b.WriteString(makeTag("lang", s.lang))
+	s.builder().makeTag("lang", s.lang)
 	return nil
 }
 
-func (s *titleInfo) serializeCoverpage(b *strings.Builder) error {
+func (s *titleInfo) serializeCoverpage() error {
 	if s.coverpage != nil {
 		str, err := s.coverpage.ToXML()
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/coverpage", s.tag())
 		}
-		b.WriteString("<coverpage>")
-		b.WriteString(str)
-		b.WriteString("</coverpage>")
+		s.builder().makeTag("coverpage", str)
 	}
 	return nil
 }
 
-func (s *titleInfo) serializeDate(b *strings.Builder) error {
+func (s *titleInfo) serializeDate() error {
 	if s.date != nil {
 		str, err := s.date.ToXML()
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/date", s.tag())
 		}
-		b.WriteString(str)
+		s.builder().WriteString(str)
 	}
 	return nil
 }
 
-func (s *titleInfo) serializeKeywords(b *strings.Builder) error {
+func (s *titleInfo) serializeKeywords() error {
 	if s.keywords != nil && len(s.keywords) > 0 {
-		b.WriteString(makeTag("keywords", strings.Join(s.keywords, ",")))
+		s.builder().makeTag("keywords", strings.Join(s.keywords, ","))
 	}
 	return nil
 }
 
-func (s *titleInfo) serializeAnnotation(b *strings.Builder) error {
+func (s *titleInfo) serializeAnnotation() error {
 	if s.annotation != nil {
 		str, err := s.annotation.ToXML()
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/annotation", s.tag())
 		}
-		b.WriteString(str)
+		s.builder().WriteString(str)
 	}
 	return nil
 }
 
-func (s *titleInfo) serializeGenres(b *strings.Builder) error {
+func (s *titleInfo) serializeGenres() error {
 	if s.genres == nil || len(s.genres) == 0 {
 		return makeError(ErrEmptyField, "Empty required field %s/genre", s.tag())
 	}
 	for _, g := range s.genres {
-		b.WriteString(makeTag("genre", g.toString()))
+		s.builder().makeTag("genre", g.toString())
 	}
 	return nil
 }
 
-func (s *titleInfo) serializeAuthors(b *strings.Builder) error {
+func (s *titleInfo) serializeAuthors() error {
 	if s.authors == nil || len(s.authors) == 0 {
 		return makeError(ErrEmptyField, "Empty required field %s/author", s.tag())
 	}
@@ -313,16 +308,16 @@ func (s *titleInfo) serializeAuthors(b *strings.Builder) error {
 		if err != nil {
 			return wrapError(err, ErrNestedEntity, "Can't make %s/author", s.tag())
 		}
-		b.WriteString(xml)
+		s.builder().WriteString(xml)
 	}
 	return nil
 }
 
-func (s *titleInfo) serializeBookTitle(b *strings.Builder) error {
+func (s *titleInfo) serializeBookTitle() error {
 	if s.bookTitle == "" {
 		return makeError(ErrEmptyField, "Empty required field %s/book-title", s.tag())
 	}
-	b.WriteString(makeTag("book-title", s.bookTitle))
+	s.builder().makeTag("book-title", s.bookTitle)
 	return nil
 }
 
