@@ -23,9 +23,17 @@ import (
   </xs:complexType>
 </xs:element>*/
 type stanza struct {
+	b        *builder
 	title    *title
 	subtitle string
-	lines    []string
+	lines    []string //An individual line in a stanza
+}
+
+func (s *stanza) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *stanza) Lines() []string {
@@ -74,7 +82,7 @@ func (s *stanza) ToXML() (string, error) {
 	if s.subtitle != "" {
 		b.WriteString(makeTag("subtitle", sanitizeString(s.subtitle)))
 	}
-	b.WriteString(makeTagMulti("v", s.lines, true))
+	b.WriteString(makeTags("v", s.lines, true))
 	fmt.Fprintf(&b, "</%s>\n", s.tag())
 
 	return b.String(), nil

@@ -37,10 +37,18 @@ const (
 
 //Pointer to cpecific document section, explaining how to deal with it
 type partShareInstructionType struct {
+	b        *builder
 	tagName  string
 	linkType string
 	href     string
 	include  DocGenerationInstructionType
+}
+
+func (s *partShareInstructionType) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *partShareInstructionType) ToXML() (string, error) {

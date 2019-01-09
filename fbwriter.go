@@ -11,25 +11,46 @@ func NewBook() *book { // nolint: golint
 	return &book{}
 }
 
-func makeTag(tagName, tagValue string) string {
-	if tagValue == "" {
-		return ""
-	}
-	return fmt.Sprintf("<%s>%s</%s>\n", tagName, tagValue, tagName)
+type builder struct {
+	strings.Builder
 }
 
-func makeTagMulti(tagName string, tagValue []string, sanitize bool) string {
-	if tagValue == nil || len(tagValue) == 0 {
-		return ""
+func (b *builder) makeTag(tagName, tagValue string) {
+	if tagValue == "" {
+		return
 	}
-	ret := ""
+	fmt.Fprintf(b, "<%s>%s</%s>\n", tagName, tagValue, tagName)
+}
+
+func (b *builder) makeTags(tagName string, tagValue []string, sanitize bool) {
+	if tagValue == nil || len(tagValue) == 0 {
+		return
+	}
 	for _, s := range tagValue {
 		if sanitize {
 			s = sanitizeString(s)
 		}
-		ret += makeTag(tagName, s)
+		b.makeTag(tagName, s)
 	}
-	return ret
+}
+
+func (b *builder) openTag(tagName string, attrs map[string]string, sanitize bool) {
+	fmt.Fprintf(b, "<%s", tagName)
+	if attrs != nil {
+		for k, v := range attrs {
+			if v != "" {
+				if sanitize {
+					v = sanitizeString(v)
+				}
+				fmt.Fprintf(b, " %s=\"%s\"", k, v)
+			}
+		}
+	}
+	fmt.Fprint(b, ">\n")
+}
+
+func (b *builder) closeTag(tagName string) {
+	fmt.Fprintf(b, "</%s>\n", tagName)
 }
 
 func sanitizeString(str string) string {
@@ -54,6 +75,6 @@ func sanitizeString(str string) string {
 	return str
 }
 
-func makeAttribute(attrName, attrValue string) string {
-	return fmt.Sprintf(`%s="%s"`, attrName, sanitizeString(attrValue))
+func (b *builder) makeAttribute(attrName, attrValue string) {
+	fmt.Fprintf(b, `%s="%s"`, attrName, sanitizeString(attrValue))
 }

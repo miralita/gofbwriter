@@ -3,6 +3,7 @@ package gofbwriter
 type fb interface {
 	ToXML() (string, error)
 	tag() string
+	builder() *builder
 }
 
 type itype int

@@ -7,7 +7,15 @@ import (
 
 //A title, used in sections, poems and body elements
 type title struct {
+	b     *builder
 	items []fb
+}
+
+func (s *title) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *title) CreateParagraph(str string) {

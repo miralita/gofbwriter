@@ -7,6 +7,7 @@ import (
 
 //Information about a single author
 type author struct {
+	b          *builder
 	firstName  string
 	middleName []string
 	lastName   string
@@ -16,6 +17,13 @@ type author struct {
 	id         []string
 	tagName    string
 	book       *book
+}
+
+func (s *author) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *author) setTagName(name string) {
@@ -93,14 +101,13 @@ func (s *author) ToXML() (string, error) {
 		return "", makeError(ErrEmptyField, "Empty required field: %s/nickname", s.tag())
 	}
 	var b strings.Builder
-
-	fmt.Fprintf(&b, "<%s>\n", s.tag())
-	b.WriteString(makeTag("first-name", s.firstName))
-	b.WriteString(makeTagMulti("middle-name", s.middleName, true))
-	b.WriteString(makeTag("last-name", s.lastName))
-	b.WriteString(makeTagMulti("nickname", s.nickname, true))
-	b.WriteString(makeTagMulti("home-page", s.homePage, true))
-	b.WriteString(makeTagMulti("email", s.email, true))
+	openTag(&b, s.tag(), nil, false)
+	makeTag(&b, "first-name", s.firstName)
+	makeTags(&b, "middle-name", s.middleName, true)
+	makeTag(&b, "last-name", s.lastName)
+	makeTags(&b, "nickname", s.nickname, true)
+	makeTags(&b, "home-page", s.homePage, true)
+	makeTags(&b, "email", s.email, true)
 	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil
 }

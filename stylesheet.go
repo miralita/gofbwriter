@@ -6,9 +6,17 @@ import (
 )
 
 type stylesheet struct {
+	b     *builder
 	ctype string
 	data  string
 	book  *book
+}
+
+func (s *stylesheet) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *stylesheet) Set(ctype, data string) {

@@ -6,8 +6,16 @@ import (
 )
 
 type customInfo struct {
+	b        *builder
 	info     string
 	infoType string
+}
+
+func (s *customInfo) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *customInfo) ToXML() (string, error) {

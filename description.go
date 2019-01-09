@@ -6,6 +6,7 @@ import (
 )
 
 type description struct {
+	b *builder
 	//Generic information about the book
 	titleInfo *titleInfo
 	//Generic information about the original book (for translations)
@@ -19,6 +20,13 @@ type description struct {
 	//Describes, how the document should be presented to end-user, what parts are free, what parts should be sold and what price should be used
 	output []*shareInstructionType
 	book   *book
+}
+
+func (s *description) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *description) Output() []*shareInstructionType {

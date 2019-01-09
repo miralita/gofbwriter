@@ -9,6 +9,7 @@ import (
 
 //Information about this particular (xml) document
 type documentInfo struct {
+	b *builder
 	//Author(s) of this particular document
 	authors []*author
 	//Any software used in preparation of this document, in free format
@@ -27,6 +28,13 @@ type documentInfo struct {
 	history []*annotation
 	//Owner of the fb2 document copyrights
 	publishers []*author
+}
+
+func (s *documentInfo) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *documentInfo) Publishers() []*author {
@@ -140,19 +148,19 @@ func (s *documentInfo) ToXML() (string, error) {
 		return "", err
 	}
 	if s.programUsed != "" {
-		b.WriteString(makeTag("program-used", sanitizeString(s.programUsed)))
+		makeTag(&b, "program-used", sanitizeString(s.programUsed))
 	}
 	if err := s.serializeDate(&b); err != nil {
 		return "", err
 	}
 	if s.srcOcr != "" {
-		b.WriteString(makeTag("src-ocr", sanitizeString(s.srcOcr)))
+		makeTag(&b, "src-ocr", sanitizeString(s.srcOcr))
 	}
 	s.serializeID(&b)
 	if s.version == 0 {
 		s.version = 1.0
 	}
-	b.WriteString(makeTag("version", fmt.Sprintf("%0.4f", s.version)))
+	makeTag(&b, "version", fmt.Sprintf("%0.4f", s.version))
 	if err := s.serializeHistory(&b); err != nil {
 		return "", err
 	}

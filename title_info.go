@@ -8,6 +8,7 @@ import (
 
 //Book (as a book opposite a document) description
 type titleInfo struct {
+	b *builder
 	//Genre of this book, with the optional match percentage
 	genres []Genre
 	//Author(s) of this book
@@ -32,6 +33,13 @@ type titleInfo struct {
 	sequences []*sequence
 	book      *book
 	tagName   string
+}
+
+func (s *titleInfo) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *titleInfo) CreateSequence() *sequence {

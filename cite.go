@@ -7,9 +7,17 @@ import (
 
 //A citation with an optional citation author at the end
 type cite struct {
+	b           *builder
 	id          string
 	items       []fb
 	textAuthors []string
+}
+
+func (s *cite) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *cite) ID() string {
@@ -101,7 +109,7 @@ func (s *cite) ToXML() (string, error) {
 			b.WriteString(str)
 		}
 	}
-	b.WriteString(makeTagMulti("text-author", s.textAuthors, true))
+	makeTags(&b, "text-author", s.textAuthors, true)
 
 	fmt.Fprintf(&b, "</%s>\n", s.tag())
 	return b.String(), nil

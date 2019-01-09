@@ -7,6 +7,7 @@ import (
 
 //Root element
 type book struct {
+	b *builder
 	//This element contains an arbitrary stylesheet that is intepreted by a some processing programs, e.g. text/css stylesheets can be used by XSLT stylesheets to generate better looking html
 	stylesheets []*stylesheet
 	description *description
@@ -16,6 +17,13 @@ type book struct {
 	notes []*body
 	//Any binary data that is required for the presentation of this book in base64 format. Currently only images are used.
 	binary []*binary
+}
+
+func (s *book) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *book) Binary() []*binary {

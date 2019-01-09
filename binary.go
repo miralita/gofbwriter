@@ -8,9 +8,17 @@ import (
 
 //Any binary data that is required for the presentation of this book in base64 format. Currently only images are used.
 type binary struct {
+	b           *builder
 	id          string
 	contentType string
 	data        []byte
+}
+
+func (s *binary) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *binary) Data() []byte {

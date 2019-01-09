@@ -1,18 +1,26 @@
 package gofbwriter
 
-import "fmt"
+import (
+	"fmt"
+)
 
 //A basic paragraph, may include simple formatting inside
 type p struct {
+	b       *builder
 	tagName string
 	text    string
 }
 
-func (s *p) ToXML() (string, error) {
-	if s.tagName == "" {
-		s.tagName = "p"
+func (s *p) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
 	}
-	return makeTag(s.tagName, sanitizeString(s.text)), nil
+	return s.b
+}
+
+func (s *p) ToXML() (string, error) {
+	s.builder().makeTag(s.tag(), sanitizeString(s.text))
+	return s.b.String(), nil
 }
 
 func (s *p) tag() string {
@@ -20,6 +28,14 @@ func (s *p) tag() string {
 }
 
 type empty struct {
+	b *builder
+}
+
+func (s *empty) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *empty) ToXML() (string, error) {

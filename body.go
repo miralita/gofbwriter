@@ -7,12 +7,20 @@ import (
 
 //Main content of the book, multiple bodies are used for additional information, like footnotes, that do not appear in the main book flow (extended from this class). The first body is presented to the reader by default, and content in the other bodies should be accessible by hyperlinks.
 type body struct {
+	b         *builder
 	image     *image      //Image to be displayed at the top of this section
 	title     *title      //A fancy title for the entire book, should be used if the simple text version in &lt;description&gt; is not adequate, e.g. the book title has multiple paragraphs and/or character styles
 	epigraphs []*epigraph //Epigraph(s) for the entire book, if any
 	sections  []*section
 	name      string
 	book      *book
+}
+
+func (s *body) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *body) Sections() []*section {

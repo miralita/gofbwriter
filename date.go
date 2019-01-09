@@ -19,6 +19,10 @@ import (
 //A human readable date, maybe not exact, with an optional computer readable variant
 type date time.Time
 
+func (s *date) builder() *builder {
+	return nil
+}
+
 func (s *date) ToXML() (string, error) {
 	dt := time.Time(*s).String()
 	return fmt.Sprintf(`<%s value="%s">%s</%s>`, s.tag(), dt, dt, s.tag()), nil

@@ -22,8 +22,16 @@ import (
   <xs:attribute name="id" type="xs:ID" use="optional"/>
 </xs:complexType>*/
 type epigraph struct {
+	b           *builder
 	textAuthors []string
 	items       []fb
+}
+
+func (s *epigraph) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *epigraph) TextAuthors() []string {

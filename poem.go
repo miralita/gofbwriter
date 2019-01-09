@@ -37,6 +37,7 @@ import (
 </xs:complexType>*/
 //A poem
 type poem struct {
+	b *builder
 	//Poem title
 	title *title
 	//Poem epigraph(s), if any
@@ -44,7 +45,14 @@ type poem struct {
 	//Each poem should have at least one stanza. Stanzas are usually separated with empty lines by user agents.
 	items   []fb //stanzas and subtitles
 	authors []string
-	date    *date
+	date    *date //Date this poem was written.
+}
+
+func (s *poem) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *poem) Date() *date {
@@ -196,7 +204,7 @@ func (s *poem) makeAuthor(b *strings.Builder) error {
 	if s.authors == nil {
 		return nil
 	}
-	b.WriteString(makeTagMulti("text-author", s.authors, true))
+	b.WriteString(makeTags("text-author", s.authors, true))
 	return nil
 }
 

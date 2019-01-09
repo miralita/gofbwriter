@@ -6,9 +6,17 @@ import (
 )
 
 type inlineImage struct {
+	b     *builder
 	alt   string
 	ctype string
 	href  string
+}
+
+func (i *inlineImage) builder() *builder {
+	if i.b == nil {
+		i.b = &builder{}
+	}
+	return i.b
 }
 
 //An empty element with an image name as an attribute

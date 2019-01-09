@@ -7,6 +7,7 @@ import (
 
 //Information about some paper/outher published document, that was used as a source of this xml document
 type publishInfo struct {
+	b *builder
 	//Original (paper) book name
 	bookName string
 	//Original (paper) book publisher
@@ -17,6 +18,13 @@ type publishInfo struct {
 	year     int
 	isbn     string
 	sequence []*sequence
+}
+
+func (s *publishInfo) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (s *publishInfo) Sequence() []*sequence {

@@ -1,7 +1,15 @@
 package gofbwriter
 
 type annotation struct {
+	b       *builder
 	tagName string
+}
+
+func (s *annotation) builder() *builder {
+	if s.b == nil {
+		s.b = &builder{}
+	}
+	return s.b
 }
 
 func (*annotation) ToXML() (string, error) {
