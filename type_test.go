@@ -1,6 +1,7 @@
 package gofbwriter
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
@@ -8,6 +9,7 @@ import (
 func TestInterface(t *testing.T) {
 	var v fb
 	v = &annotation{}
+	assert.Equal(t, "annotation", v.tag(), "Should be annotation")
 	t.Log(v.tag())
 	v = &author{}
 	t.Log(v.tag())
