@@ -86,6 +86,7 @@ func (s *body) ToXML() (string, error) {
 		return "", makeError(ErrEmptyField, "Empty required field %s/section", s.tag())
 	}
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"name": s.name}, false)
 	if err := s.serializeImage(); err != nil {
 		return "", err

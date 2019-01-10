@@ -174,6 +174,7 @@ func (s *titleInfo) CreateAuthor(firstName, middleName, lastName string) *author
 
 func (s *titleInfo) ToXML() (string, error) { // nolint: gocyclo
 	b := s.builder()
+	b.Reset()
 	b.openTag(s.tag())
 
 	if err := s.serializeGenres(); err != nil {

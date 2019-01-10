@@ -142,6 +142,7 @@ func (s *documentInfo) AddAuthor(docAuthor *author) {
 
 func (s *documentInfo) ToXML() (string, error) {
 	b := s.builder()
+	b.Reset()
 	b.openTag(s.tag())
 	if err := s.serializeAuthors(); err != nil {
 		return "", err

@@ -92,10 +92,11 @@ func (s *author) AddHomepage(name string) {
 func (s *author) ToXML() (string, error) {
 	if s.firstName != "" && s.lastName == "" {
 		return "", makeError(ErrEmptyFirstName, "Empty required field: author/first-name")
-	} else if s.firstName == "" && s.lastName == "" {
-		return "", makeError(ErrEmptyField, "Empty required field: %s/nickname", s.tag())
+	} else if s.firstName == "" && s.lastName == "" && s.nickname == nil {
+		return "", makeError(ErrEmptyField, "Empty required field: %s/nickname or %s/first-name + %s/last-name", s.tag(), s.tag(), s.tag())
 	}
 	b := s.builder()
+	b.Reset()
 	b.openTag(s.tag())
 	b.makeTag("first-name", s.firstName)
 	b.makeTags("middle-name", s.middleName, true)

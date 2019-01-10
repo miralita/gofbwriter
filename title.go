@@ -38,6 +38,7 @@ func (s *title) ToXML() (string, error) {
 		return fmt.Sprintf("<%s />\n", s.tag()), nil
 	}
 	b := s.builder()
+	b.Reset()
 	b.openTag(s.tag())
 	for _, i := range s.items {
 		str, err := i.ToXML()

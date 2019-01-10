@@ -58,6 +58,7 @@ func (s *partShareInstructionType) ToXML() (string, error) {
 		return "", wrapError(err, ErrNestedEntity, "Can't make %s/include attribute", s.tag())
 	}
 	b := s.builder()
+	b.Reset()
 	b.makeTagAttr(s.tag(), "", map[string]string{"type": s.linkType, "href": s.href, "include": str}, false)
 	return b.String(), nil
 }

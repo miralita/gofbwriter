@@ -1,5 +1,6 @@
 package gofbwriter
 
+//Basic html-like tables
 type table struct {
 	b *builder
 }
@@ -11,7 +12,7 @@ func (s *table) builder() *builder {
 	return s.b
 }
 
-func (*table) ToXML() (string, error) {
+func (s *table) ToXML() (string, error) {
 	panic("implement me")
 }
 

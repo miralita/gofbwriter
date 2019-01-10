@@ -180,6 +180,7 @@ func (s *section) ToXML() (string, error) {
 		return "", makeError(ErrEmptyField, "Section musts contain nested sections or formatted text")
 	}
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"id": s.id}, false)
 	if err := s.makeTitle(); err != nil {
 		return "", err
@@ -194,6 +195,9 @@ func (s *section) ToXML() (string, error) {
 		return "", err
 	}
 	if err := s.makeSections(); err != nil {
+		return "", err
+	}
+	if err := s.makeItems(); err != nil {
 		return "", err
 	}
 	b.closeTag(s.tag())

@@ -25,6 +25,7 @@ func (s *annotation) builder() *builder {
 
 func (s *annotation) ToXML() (string, error) {
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"id": s.id}, false)
 	if s.items != nil {
 		for _, item := range s.items {

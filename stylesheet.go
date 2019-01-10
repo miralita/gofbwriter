@@ -21,6 +21,7 @@ func (s *stylesheet) Set(ctype, data string) {
 
 func (s *stylesheet) ToXML() (string, error) {
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"type": s.ctype}, false)
 	b.WriteString(s.data)
 	b.closeTag(s.tag())

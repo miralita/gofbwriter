@@ -21,6 +21,7 @@ func (s *customInfo) ToXML() (string, error) {
 		return "", makeError(ErrEmptyAttribute, "Empty attribute %s for custom-info", s.tag())
 	}
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"info-type": s.infoType}, false)
 	b.WriteString(s.info)
 	b.closeTag(s.tag())

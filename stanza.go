@@ -66,6 +66,7 @@ func (s *stanza) ToXML() (string, error) {
 		return "", makeError(ErrEmptyField, "Empty required %s/v", s.tag())
 	}
 	b := s.builder()
+	b.Reset()
 	b.openTag(s.tag())
 	if s.title != nil {
 		str, err := s.ToXML()

@@ -92,6 +92,7 @@ func (s *description) CreateTitleInfo() *titleInfo {
 
 func (s *description) ToXML() (string, error) {
 	b := s.builder()
+	b.Reset()
 	b.openTag(s.tag())
 	if err := s.serializeTitleInfo(); err != nil {
 		return "", err
@@ -145,7 +146,7 @@ func (s *description) serializePublishInfo() error {
 	if s.publishInfo == nil {
 		return makeError(ErrEmptyField, "Empty required %s/publish-info", s.tag())
 	}
-	str, err := s.documentInfo.ToXML()
+	str, err := s.publishInfo.ToXML()
 	if err != nil {
 		return wrapError(err, ErrNestedEntity, "Can't make %s/publish-info", s.tag())
 	}

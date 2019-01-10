@@ -89,6 +89,7 @@ func (s *cite) AppendItem(item fb) error {
 
 func (s *cite) ToXML() (string, error) {
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"id": s.id}, false)
 	if s.items != nil {
 		for _, item := range s.items {

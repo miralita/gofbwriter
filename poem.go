@@ -138,6 +138,7 @@ func (s *poem) CreateEpigraph() *epigraph {
 
 func (s *poem) ToXML() (string, error) {
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"id": s.id}, false)
 	if err := s.makeTitle(); err != nil {
 		return "", err

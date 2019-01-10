@@ -53,11 +53,13 @@ func (i *image) SetTitle(title string) {
 }
 
 func (i *inlineImage) ToXML() (string, error) {
+	i.builder().Reset()
 	i.builder().makeTagAttr(i.tag(), "", map[string]string{"ctype": i.ctype, "alt": i.alt, "href": i.href}, false)
 	return i.builder().String(), nil
 }
 
 func (i *image) ToXML() (string, error) {
+	i.builder().Reset()
 	i.builder().makeTagAttr(i.tag(), "", map[string]string{"ctype": i.ctype, "alt": i.alt, "href": i.href, "title": i.title}, false)
 	return i.builder().String(), nil
 }

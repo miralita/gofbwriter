@@ -33,6 +33,7 @@ func (s *binary) ID() string {
 
 func (s *binary) ToXML() (string, error) {
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"id": s.id, "content-type": s.contentType}, false)
 	b.WriteString(base64.StdEncoding.EncodeToString(s.data))
 	b.closeTag(s.tag())

@@ -15,6 +15,7 @@ func (s *p) builder() *builder {
 }
 
 func (s *p) ToXML() (string, error) {
+	s.builder().Reset()
 	s.builder().makeTag(s.tag(), sanitizeString(s.text))
 	return s.b.String(), nil
 }
@@ -38,6 +39,7 @@ func (s *empty) builder() *builder {
 }
 
 func (s *empty) ToXML() (string, error) {
+	s.builder().Reset()
 	s.builder().makeTagAttr(s.tag(), "", nil, false)
 	return s.builder().String(), nil
 }

@@ -1,4 +1,4 @@
-module github.com/miralita/go-fbwriter
+module github.com/miralita/gofbwriter
 
 require (
 	github.com/kr/pretty v0.1.0 // indirect

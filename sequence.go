@@ -54,6 +54,7 @@ func (s *sequence) ToXML() (string, error) {
 		return "", makeError(ErrEmptyAttribute, "Empty required attribute %s/name", s.tag())
 	}
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"name": s.name, "number": strconv.Itoa(s.number)}, false)
 	b.closeTag(s.tag())
 	if s.sequences != nil {

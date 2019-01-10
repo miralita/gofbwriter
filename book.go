@@ -2,6 +2,7 @@ package gofbwriter
 
 import (
 	"fmt"
+	"io/ioutil"
 )
 
 //Root element
@@ -89,6 +90,7 @@ func (s *book) CreateDescription() *description {
 
 func (s *book) ToXML() (string, error) {
 	b := s.builder()
+	b.Reset()
 	fmt.Fprintf(b, `<?xml version="1.0" encoding="UTF-8"?>
 <%s xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
 `, s.tag())
@@ -109,6 +111,14 @@ func (s *book) ToXML() (string, error) {
 	}
 	b.closeTag(s.tag())
 	return b.String(), nil
+}
+
+func (s *book) Save(filename string) error {
+	str, err := s.ToXML()
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(filename, []byte(str), 0644)
 }
 
 func (s *book) makeBinary() error {

@@ -86,6 +86,7 @@ func (s *publishInfo) SetBookName(bookName string) {
 
 func (s *publishInfo) ToXML() (string, error) {
 	b := s.builder()
+	b.Reset()
 	b.openTag(s.tag())
 	b.makeTag("book-name", sanitizeString(s.bookName))
 	b.makeTag("publisher", sanitizeString(s.publisher))

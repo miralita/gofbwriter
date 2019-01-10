@@ -103,6 +103,7 @@ func (s *epigraph) ToXML() (string, error) {
 		return fmt.Sprintf("<%s />\n", s.tag()), nil
 	}
 	b := s.builder()
+	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"id": s.id}, false)
 	if s.items != nil {
 		for _, i := range s.items {
