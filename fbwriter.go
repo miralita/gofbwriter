@@ -87,7 +87,7 @@ func sanitizeString(str string) string {
 	re := regexp.MustCompile(`<(/?[A-z0-9-]+).*?>`)
 	str = re.ReplaceAllString(str, "<$1>")
 	str = re.ReplaceAllStringFunc(str, func(s string) string {
-		goodTags := []string{"b", "i", "strong", "del", "em", "pre", "small", "sub", "sup", "u"}
+		goodTags := []string{"b", "i", "strong", "del", "em", "pre", "small", "sub", "sup", "u", "strikethrough", "emphasis"}
 		for _, t := range goodTags {
 			if strings.HasPrefix(s, "<"+t) || strings.HasPrefix(s, "</"+t) {
 				return s
