@@ -24,6 +24,15 @@ type epigraph struct {
 	b           *builder
 	textAuthors []string
 	items       []fb
+	id          string
+}
+
+func (s *epigraph) ID() string {
+	return s.id
+}
+
+func (s *epigraph) SetID(id string) {
+	s.id = id
 }
 
 func (s *epigraph) builder() *builder {
@@ -94,7 +103,7 @@ func (s *epigraph) ToXML() (string, error) {
 		return fmt.Sprintf("<%s />\n", s.tag()), nil
 	}
 	b := s.builder()
-	b.openTag(s.tag())
+	b.openTagAttr(s.tag(), map[string]string{"id": s.id}, false)
 	if s.items != nil {
 		for _, i := range s.items {
 			str, err := i.ToXML()

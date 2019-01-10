@@ -20,7 +20,10 @@ func (s *p) ToXML() (string, error) {
 }
 
 func (s *p) tag() string {
-	return "p"
+	if s.tagName == "" {
+		s.tagName = "p"
+	}
+	return s.tagName
 }
 
 type empty struct {

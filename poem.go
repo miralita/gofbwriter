@@ -44,6 +44,15 @@ type poem struct {
 	items   []fb //stanzas and subtitles
 	authors []string
 	date    *date //Date this poem was written.
+	id      string
+}
+
+func (s *poem) ID() string {
+	return s.id
+}
+
+func (s *poem) SetID(id string) {
+	s.id = id
 }
 
 func (s *poem) builder() *builder {
@@ -129,7 +138,7 @@ func (s *poem) CreateEpigraph() *epigraph {
 
 func (s *poem) ToXML() (string, error) {
 	b := s.builder()
-	b.openTag(s.tag())
+	b.openTagAttr(s.tag(), map[string]string{"id": s.id}, false)
 	if err := s.makeTitle(); err != nil {
 		return "", err
 	}
