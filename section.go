@@ -1,73 +1,81 @@
 package gofbwriter
 
-//A basic block of a book, can contain more child sections or textual content
-type section struct {
+//Section - a basic block of a book, can contain more child sections or textual content
+type Section struct {
 	b          *builder
-	title      *title      //Section's title
-	epigraphs  []*epigraph //Epigraph(s) for this section
-	image      *image      //Image to be displayed at the top of this section
-	annotation *annotation //Annotation for this section, if any
+	title      *Title      //Section's title
+	epigraphs  []*Epigraph //Epigraph(s) for this section
+	image      *Image      //Image to be displayed at the top of this section
+	annotation *Annotation //Annotation for this section, if any
 	id         string
-	sections   []*section //Child sections
-	items      []fb
+	sections   []*Section //Child sections
+	items      []Fb
 }
 
-func (s *section) CreateTitle() *title {
-	s.title = &title{}
+//CreateTitle - create and return new Title. Old title will be dropped
+func (s *Section) CreateTitle() *Title {
+	s.title = &Title{}
 	return s.title
 }
 
-func (s *section) CreateEpigraph() *epigraph {
-	ep := &epigraph{}
+//CreateEpigraph - create new Epigraph, add it to list and return
+func (s *Section) CreateEpigraph() *Epigraph {
+	ep := &Epigraph{}
 	if s.epigraphs == nil {
-		s.epigraphs = []*epigraph{ep}
+		s.epigraphs = []*Epigraph{ep}
 	} else {
 		s.epigraphs = append(s.epigraphs, ep)
 	}
 	return ep
 }
 
-func (s *section) CreateSectionImage() *image {
-	s.image = &image{}
+//CreateSectionImage - create and return new main image of the section. Old Image will be dropped
+func (s *Section) CreateSectionImage() *Image {
+	s.image = &Image{}
 	return s.image
 }
 
-func (s *section) CreateAnnotation() *annotation {
-	s.annotation = &annotation{}
+//CreateAnnotation - create and return new Annotation. Old annotation will be dropped
+func (s *Section) CreateAnnotation() *Annotation {
+	s.annotation = &Annotation{}
 	return s.annotation
 }
 
-func (s *section) CreateSection() (*section, error) {
+//CreateSection - create  new Section, add it to list and return.
+func (s *Section) CreateSection() (*Section, error) {
 	if s.items != nil && len(s.items) > 0 {
 		return nil, makeError(ErrUnsupportedNestedItem, "Can't mix nested sections with formatted text in section")
 	}
-	item := &section{}
+	item := &Section{}
 	if s.sections == nil {
-		s.sections = []*section{item}
+		s.sections = []*Section{item}
 	} else {
 		s.sections = append(s.sections, item)
 	}
 	return item, nil
 }
 
-func (s *section) AddSection(item *section) error {
+//AddSection - add existing section to list of sections
+func (s *Section) AddSection(item *Section) error {
 	if s.items != nil && len(s.items) > 0 {
 		return makeError(ErrUnsupportedNestedItem, "Can't mix nested sections with formatted text in section")
 	}
 	if s.sections == nil {
-		s.sections = []*section{item}
+		s.sections = []*Section{item}
 	} else {
 		s.sections = append(s.sections, item)
 	}
 	return nil
 }
 
-func (s *section) AddParagraph(text string) error {
+//AddParagraph - add paragraph to formatted text block
+func (s *Section) AddParagraph(text string) error {
 	return s.AppendItem(&p{text: text})
 }
 
-func (s *section) CreateImage() (*image, error) {
-	item := &image{}
+//CreateImage - create new Image, add it to formatted text block and return
+func (s *Section) CreateImage() (*Image, error) {
+	item := &Image{}
 	err := s.AppendItem(item)
 	if err != nil {
 		return nil, err
@@ -75,8 +83,9 @@ func (s *section) CreateImage() (*image, error) {
 	return item, nil
 }
 
-func (s *section) CreatePoem() (*poem, error) {
-	item := &poem{}
+//CreatePoem - create new Poem, add it to formatted text block and return
+func (s *Section) CreatePoem() (*Poem, error) {
+	item := &Poem{}
 	err := s.AppendItem(item)
 	if err != nil {
 		return nil, err
@@ -85,12 +94,14 @@ func (s *section) CreatePoem() (*poem, error) {
 
 }
 
-func (s *section) AddSubtitle(text string) error {
+//AddSubtitle - add subtitle to formatted text block
+func (s *Section) AddSubtitle(text string) error {
 	return s.AppendItem(&p{text: text, tagName: "subtitle"})
 }
 
-func (s *section) CreateCite() (*cite, error) {
-	item := &cite{}
+//CreateCite - create new Cite, add it to formatted text block and  return
+func (s *Section) CreateCite() (*Cite, error) {
+	item := &Cite{}
 	err := s.AppendItem(item)
 	if err != nil {
 		return nil, err
@@ -98,12 +109,14 @@ func (s *section) CreateCite() (*cite, error) {
 	return item, nil
 }
 
-func (s *section) AddEmptyLine() error {
+//AddEmptyLine - add empty-line to formatted text block
+func (s *Section) AddEmptyLine() error {
 	return s.AppendItem(&empty{})
 }
 
-func (s *section) CreateTable() (*table, error) {
-	item := &table{}
+//CreateTable - create new Table, add it to formatted text block and return
+func (s *Section) CreateTable() (*Table, error) {
+	item := &Table{}
 	err := s.AppendItem(item)
 	if err != nil {
 		return nil, err
@@ -111,38 +124,43 @@ func (s *section) CreateTable() (*table, error) {
 	return item, nil
 }
 
-func (s *section) AddImage(item *image) error {
+//AddImage - add existing Image to formatted text block
+func (s *Section) AddImage(item *Image) error {
 	return s.AppendItem(item)
 }
 
-func (s *section) AddPoem(item *poem) error {
+//AddPoem - add existing Poem to formatted text block
+func (s *Section) AddPoem(item *Poem) error {
 	return s.AppendItem(item)
 }
 
-func (s *section) AddCite(item *cite) error {
+//AddCite - add existing Cite to formatted text block
+func (s *Section) AddCite(item *Cite) error {
 	return s.AppendItem(item)
 }
 
-func (s *section) AddTable(item *table) error {
+//AddTable - add existing Table to formatted text block
+func (s *Section) AddTable(item *Table) error {
 	return s.AppendItem(item)
 }
 
-func (s *section) AppendItem(item fb) error { // nolint: gocyclo
+//AppendItem - add existing element to formatted text block
+func (s *Section) AppendItem(item Fb) error { // nolint: gocyclo
 	if s.sections != nil && len(s.sections) > 0 {
 		return makeError(ErrUnsupportedNestedItem, "Can't mix nested sections with formatted text in section")
 	}
 	pass := false
 	if _, ok := item.(*p); ok {
 		pass = true
-	} else if _, ok := item.(*poem); ok {
+	} else if _, ok := item.(*Poem); ok {
 		pass = true
-	} else if _, ok := item.(*cite); ok {
+	} else if _, ok := item.(*Cite); ok {
 		pass = true
 	} else if _, ok := item.(*empty); ok {
 		pass = true
-	} else if _, ok := item.(*table); ok {
+	} else if _, ok := item.(*Table); ok {
 		pass = true
-	} else if _, ok := item.(*image); ok {
+	} else if _, ok := item.(*Image); ok {
 		if s.items != nil && len(s.items) > 0 {
 			pass = true
 		} else {
@@ -153,29 +171,32 @@ func (s *section) AppendItem(item fb) error { // nolint: gocyclo
 		return makeError(ErrUnsupportedNestedItem, "Can't use type %T in section", item)
 	}
 	if s.items == nil {
-		s.items = []fb{item}
+		s.items = []Fb{item}
 	} else {
 		s.items = append(s.items, item)
 	}
 	return nil
 }
 
-func (s *section) ID() string {
+//ID - get ID attribute
+func (s *Section) ID() string {
 	return s.id
 }
 
-func (s *section) SetID(id string) {
+//SetID - set ID attribute
+func (s *Section) SetID(id string) {
 	s.id = id
 }
 
-func (s *section) builder() *builder {
+func (s *Section) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *section) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *Section) ToXML() (string, error) {
 	if s.IsEmpty() {
 		return "", makeError(ErrEmptyField, "Section musts contain nested sections or formatted text")
 	}
@@ -204,7 +225,7 @@ func (s *section) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *section) makeItems() error {
+func (s *Section) makeItems() error {
 	if s.items != nil {
 		for _, item := range s.items {
 			str, err := item.ToXML()
@@ -217,7 +238,7 @@ func (s *section) makeItems() error {
 	return nil
 }
 
-func (s *section) makeSections() error {
+func (s *Section) makeSections() error {
 	if s.sections != nil {
 		for _, item := range s.sections {
 			str, err := item.ToXML()
@@ -230,7 +251,7 @@ func (s *section) makeSections() error {
 	return nil
 }
 
-func (s *section) makeAnnotation() error {
+func (s *Section) makeAnnotation() error {
 	if s.annotation != nil {
 		str, err := s.annotation.ToXML()
 		if err != nil {
@@ -241,7 +262,7 @@ func (s *section) makeAnnotation() error {
 	return nil
 }
 
-func (s *section) makeImage() error {
+func (s *Section) makeImage() error {
 	if s.image != nil {
 		str, err := s.image.ToXML()
 		if err != nil {
@@ -252,7 +273,7 @@ func (s *section) makeImage() error {
 	return nil
 }
 
-func (s *section) makeEpigraphs() error {
+func (s *Section) makeEpigraphs() error {
 	if s.epigraphs != nil {
 		for _, item := range s.epigraphs {
 			str, err := item.ToXML()
@@ -265,7 +286,7 @@ func (s *section) makeEpigraphs() error {
 	return nil
 }
 
-func (s *section) makeTitle() error {
+func (s *Section) makeTitle() error {
 	if s.title != nil {
 		str, err := s.title.ToXML()
 		if err != nil {
@@ -276,10 +297,11 @@ func (s *section) makeTitle() error {
 	return nil
 }
 
-func (s *section) IsEmpty() bool {
+//IsEmpty - check if section doesn't contain any nested sections or formatted text
+func (s *Section) IsEmpty() bool {
 	return (s.items == nil || len(s.items) == 0) && (s.sections == nil || len(s.sections) == 0)
 }
 
-func (s *section) tag() string {
+func (s *Section) tag() string {
 	return "section"
 }

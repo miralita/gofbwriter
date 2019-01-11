@@ -1,7 +1,7 @@
 package gofbwriter
 
-//Information about a single author
-type author struct {
+//Author - Information about a single author
+type Author struct {
 	b          *builder
 	firstName  string
 	middleName []string
@@ -11,25 +11,26 @@ type author struct {
 	email      []string
 	id         []string
 	tagName    string
-	book       *book
 }
 
-func (s *author) builder() *builder {
+func (s *Author) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *author) setTagName(name string) {
+func (s *Author) setTagName(name string) {
 	s.tagName = name
 }
 
-func (s *author) Email() []string {
+//Emails - get list of author's emails
+func (s *Author) Emails() []string {
 	return s.email
 }
 
-func (s *author) AddEmail(email string) {
+//AddEmail - add new email to list of author's emails
+func (s *Author) AddEmail(email string) {
 	if s.email == nil {
 		s.email = []string{email}
 	} else {
@@ -37,35 +38,43 @@ func (s *author) AddEmail(email string) {
 	}
 }
 
-func (s *author) HomePage() []string {
+//HomePages - get list of author's home pages
+func (s *Author) HomePages() []string {
 	return s.homePage
 }
 
-func (s *author) Nickname() []string {
+//Nicknames - get list of author's nicknames
+func (s *Author) Nicknames() []string {
 	return s.nickname
 }
 
-func (s *author) MiddleName() []string {
+//MiddleNames -  get list of author's middle names
+func (s *Author) MiddleNames() []string {
 	return s.middleName
 }
 
-func (s *author) LastName() string {
+//LastName - get author's last name
+func (s *Author) LastName() string {
 	return s.lastName
 }
 
-func (s *author) SetLastName(lastName string) {
+//SetLastName - set author's last name
+func (s *Author) SetLastName(lastName string) {
 	s.lastName = lastName
 }
 
-func (s *author) FirstName() string {
+//FirstName - get author's first name
+func (s *Author) FirstName() string {
 	return s.firstName
 }
 
-func (s *author) SetFirstName(firstName string) {
+//SetFirstName - set author's first name
+func (s *Author) SetFirstName(firstName string) {
 	s.firstName = firstName
 }
 
-func (s *author) AddMiddleName(name string) {
+//AddMiddleName - add new middle name to list of author's middle names
+func (s *Author) AddMiddleName(name string) {
 	if s.middleName == nil {
 		s.middleName = []string{name}
 	} else {
@@ -73,7 +82,8 @@ func (s *author) AddMiddleName(name string) {
 	}
 }
 
-func (s *author) AddNickname(name string) {
+//AddNickname - add new nickname to list of author's nicknames
+func (s *Author) AddNickname(name string) {
 	if s.nickname == nil {
 		s.nickname = []string{name}
 	} else {
@@ -81,7 +91,8 @@ func (s *author) AddNickname(name string) {
 	}
 }
 
-func (s *author) AddHomepage(name string) {
+//AddHomepage - add new homepage to list of author's homepages
+func (s *Author) AddHomepage(name string) {
 	if s.nickname == nil {
 		s.nickname = []string{name}
 	} else {
@@ -89,7 +100,8 @@ func (s *author) AddHomepage(name string) {
 	}
 }
 
-func (s *author) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *Author) ToXML() (string, error) {
 	if s.firstName != "" && s.lastName == "" {
 		return "", makeError(ErrEmptyFirstName, "Empty required field: author/first-name")
 	} else if s.firstName == "" && s.lastName == "" && s.nickname == nil {
@@ -108,7 +120,7 @@ func (s *author) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *author) tag() string {
+func (s *Author) tag() string {
 	if s.tagName == "" {
 		s.tagName = "author"
 	}

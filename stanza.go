@@ -1,59 +1,49 @@
 package gofbwriter
 
-/*<xs:element name="stanza">
-  <xs:annotation>
-    <xs:documentation>Each poem should have at least one stanza. Stanzas are usually separated with empty lines by user agents.</xs:documentation>
-  </xs:annotation>
-  <xs:complexType>
-    <xs:sequence>
-      <xs:element name="title" type="titleType" minOccurs="0"/>
-      <xs:element name="subtitle" type="pType" minOccurs="0"/>
-      <xs:element name="v" type="pType" maxOccurs="unbounded">
-        <xs:annotation>
-          <xs:documentation>An individual line in a stanza</xs:documentation>
-        </xs:annotation>
-      </xs:element>
-    </xs:sequence>
-    <xs:attribute ref="xml:lang"/>
-  </xs:complexType>
-</xs:element>*/
-type stanza struct {
+//Stanza - Each poem should have at least one stanza. Stanzas are usually separated with empty lines by user agents.
+type Stanza struct {
 	b        *builder
-	title    *title
+	title    *Title
 	subtitle string
 	lines    []string //An individual line in a stanza
 }
 
-func (s *stanza) builder() *builder {
+func (s *Stanza) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *stanza) Lines() []string {
+//Lines - get lines of stanza
+func (s *Stanza) Lines() []string {
 	return s.lines
 }
 
-func (s *stanza) Subtitle() string {
+//Subtitle - get subtitile
+func (s *Stanza) Subtitle() string {
 	return s.subtitle
 }
 
-func (s *stanza) Title() *title {
+//Title - get title
+func (s *Stanza) Title() *Title {
 	return s.title
 }
 
-func (s *stanza) CreateTitle() *title {
-	t := &title{}
+//CreateTitle - create and return new Title; old value will be dropped
+func (s *Stanza) CreateTitle() *Title {
+	t := &Title{}
 	s.title = t
 	return t
 }
 
-func (s *stanza) SetSubtitle(subtl string) {
+//SetSubtitle - set subtitle
+func (s *Stanza) SetSubtitle(subtl string) {
 	s.subtitle = subtl
 }
 
-func (s *stanza) AddLine(line string) {
+//AddLine - add new line to stanza
+func (s *Stanza) AddLine(line string) {
 	if s.lines == nil {
 		s.lines = []string{line}
 	} else {
@@ -61,7 +51,8 @@ func (s *stanza) AddLine(line string) {
 	}
 }
 
-func (s *stanza) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *Stanza) ToXML() (string, error) {
 	if s.lines == nil || len(s.lines) == 0 {
 		return "", makeError(ErrEmptyField, "Empty required %s/v", s.tag())
 	}
@@ -82,6 +73,6 @@ func (s *stanza) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *stanza) tag() string {
+func (s *Stanza) tag() string {
 	return "stanza"
 }

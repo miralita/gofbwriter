@@ -1,19 +1,21 @@
 package gofbwriter
 
-type customInfo struct {
+//CustomInfo - Any other information about the book/document
+type CustomInfo struct {
 	b        *builder
 	info     string
 	infoType string
 }
 
-func (s *customInfo) builder() *builder {
+func (s *CustomInfo) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *customInfo) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *CustomInfo) ToXML() (string, error) {
 	if s.info == "" {
 		return "", makeError(ErrEmptyField, "Empty %s value", s.tag())
 	}
@@ -28,6 +30,6 @@ func (s *customInfo) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *customInfo) tag() string {
+func (s *CustomInfo) tag() string {
 	return "custom-info"
 }

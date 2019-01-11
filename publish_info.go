@@ -4,8 +4,8 @@ import (
 	"fmt"
 )
 
-//Information about some paper/outher published document, that was used as a source of this xml document
-type publishInfo struct {
+//PublishInfo - Information about some paper/outher published document, that was used as a source of this xml document
+type PublishInfo struct {
 	b *builder
 	//Original (paper) book name
 	bookName string
@@ -16,75 +16,89 @@ type publishInfo struct {
 	//Year of the original (paper) publication
 	year     int
 	isbn     string
-	sequence []*sequence
+	sequence []*Sequence
 }
 
-func (s *publishInfo) builder() *builder {
+func (s *PublishInfo) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *publishInfo) Sequence() []*sequence {
+//Sequences - get list of book sequences
+func (s *PublishInfo) Sequences() []*Sequence {
 	return s.sequence
 }
 
-func (s *publishInfo) AddSequence(seq *sequence) {
+//AddSequence - add existing sequence to list
+func (s *PublishInfo) AddSequence(seq *Sequence) {
 	if s.sequence == nil {
-		s.sequence = []*sequence{seq}
+		s.sequence = []*Sequence{seq}
 	} else {
 		s.sequence = append(s.sequence, seq)
 	}
 }
 
-func (s *publishInfo) CreateSequence() *sequence {
-	seq := &sequence{}
+//CreateSequence - create new Sequence, add it to list and return
+func (s *PublishInfo) CreateSequence() *Sequence {
+	seq := &Sequence{}
 	s.AddSequence(seq)
 	return seq
 }
 
-func (s *publishInfo) Isbn() string {
+//ISBN - get book ISBN
+func (s *PublishInfo) ISBN() string {
 	return s.isbn
 }
 
-func (s *publishInfo) SetIsbn(isbn string) {
+//SetISBN - set book ISBN
+func (s *PublishInfo) SetISBN(isbn string) {
 	s.isbn = isbn
 }
 
-func (s *publishInfo) Year() int {
+//Year - get year of the original (paper) publication
+func (s *PublishInfo) Year() int {
 	return s.year
 }
 
-func (s *publishInfo) SetYear(year int) {
+//SetYear - set year of the original (paper) publication
+func (s *PublishInfo) SetYear(year int) {
 	s.year = year
 }
 
-func (s *publishInfo) City() string {
+//City - get city where the original (paper) book was published
+func (s *PublishInfo) City() string {
 	return s.city
 }
 
-func (s *publishInfo) SetCity(city string) {
+//SetCity - set city where the original (paper) book was published
+func (s *PublishInfo) SetCity(city string) {
 	s.city = city
 }
 
-func (s *publishInfo) Publisher() string {
+//Publisher - get original (paper) book publisher
+func (s *PublishInfo) Publisher() string {
 	return s.publisher
 }
 
-func (s *publishInfo) SetPublisher(publisher string) {
+//SetPublisher - set original (paper) book publisher
+func (s *PublishInfo) SetPublisher(publisher string) {
 	s.publisher = publisher
 }
 
-func (s *publishInfo) BookName() string {
+//BookName - get original (paper) book name
+func (s *PublishInfo) BookName() string {
 	return s.bookName
 }
 
-func (s *publishInfo) SetBookName(bookName string) {
+//SetBookName - original (paper) book name
+func (s *PublishInfo) SetBookName(bookName string) {
 	s.bookName = bookName
 }
 
-func (s *publishInfo) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *PublishInfo) ToXML() (string, error) {
 	b := s.builder()
 	b.Reset()
 	b.openTag(s.tag())
@@ -108,6 +122,6 @@ func (s *publishInfo) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *publishInfo) tag() string {
+func (s *PublishInfo) tag() string {
 	return "publish-info"
 }

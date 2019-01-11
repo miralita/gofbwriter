@@ -1,21 +1,22 @@
 package gofbwriter
 
-//Basic html-like tables
-type table struct {
+//Table - basic html-like tables
+type Table struct {
 	b *builder
 }
 
-func (s *table) builder() *builder {
+func (s *Table) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *table) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *Table) ToXML() (string, error) {
 	panic("implement me")
 }
 
-func (s *table) tag() string {
+func (s *Table) tag() string {
 	return "table"
 }

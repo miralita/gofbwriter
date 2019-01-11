@@ -5,99 +5,101 @@ import (
 	"time"
 )
 
-//Book (as a book opposite a document) description
-type titleInfo struct {
+//TitleInfo - Book (as a book opposite a document) description
+type TitleInfo struct {
 	b *builder
 	//Genre of this book, with the optional match percentage
 	genres []Genre
 	//Author(s) of this book
-	authors []*author
+	authors []*Author
 	//Book title
 	bookTitle string
 	//Annotation for this book
-	annotation *annotation
+	annotation *Annotation
 	//Any keywords for this book, intended for use in search engines
 	keywords []string
 	//Date this book was written, can be not exact, e.g. 1863-1867. If an optional attribute is present, then it should contain some computer-readable date from the interval for use by search and indexingengines
-	date *date
+	date *Date
 	//Any coverpage items, currently only images
-	coverpage *inlineImage
+	coverpage *InlineImage
 	//Book's language
 	lang string
 	//Book's source language if this is a translation
 	srcLang string
 	//Translators if this is a translation
-	translators []*author
+	translators []*Author
 	//Any sequences this book might be part of
-	sequences []*sequence
-	book      *book
+	sequences []*Sequence
 	tagName   string
 }
 
-func (s *titleInfo) builder() *builder {
+func (s *TitleInfo) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *titleInfo) CreateSequence() *sequence {
-	seq := &sequence{}
+//CreateSequence - create new Sequence, add to list of sequences and return
+func (s *TitleInfo) CreateSequence() *Sequence {
+	seq := &Sequence{}
 	if s.sequences == nil {
-		s.sequences = []*sequence{seq}
+		s.sequences = []*Sequence{seq}
 	} else {
 		s.sequences = append(s.sequences, seq)
 	}
 	return seq
 }
 
-//Getter for sequences this book is part of
-func (s *titleInfo) Sequences() []*sequence {
+//Sequences - Getter for sequences this book is part of
+func (s *TitleInfo) Sequences() []*Sequence {
 	return s.sequences
 }
 
-//Get translators list
-func (s *titleInfo) Translators() []*author {
+//Translators - Get translators list
+func (s *TitleInfo) Translators() []*Author {
 	return s.translators
 }
 
-//Creates a new translator, adds it to the list and returns reference
-func (s *titleInfo) CreateTranslator() *author {
-	tr := &author{tagName: "translator"}
+//CreateTranslator - create a new translator, add it to the list and return reference
+func (s *TitleInfo) CreateTranslator() *Author {
+	tr := &Author{tagName: "translator"}
 	if s.translators == nil {
-		s.translators = []*author{tr}
+		s.translators = []*Author{tr}
 	} else {
 		s.translators = append(s.translators, tr)
 	}
 	return tr
 }
 
-//Getter for source language
-func (s *titleInfo) SrcLang() string {
+//SrcLang - get source language (for translation)
+func (s *TitleInfo) SrcLang() string {
 	return s.srcLang
 }
 
-//Setter for source language
-func (s *titleInfo) SetSrcLang(srcLang string) {
+//SetSrcLang - set source language
+func (s *TitleInfo) SetSrcLang(srcLang string) {
 	s.srcLang = srcLang
 }
 
-//Getter for language
-func (s *titleInfo) Lang() string {
+//Lang - get language
+func (s *TitleInfo) Lang() string {
 	return s.lang
 }
 
-//Setter for language
-func (s *titleInfo) SetLang(lang string) {
+//SetLang - set language
+func (s *TitleInfo) SetLang(lang string) {
 	s.lang = lang
 }
 
-func (s *titleInfo) Coverpage() *inlineImage {
+//Coverpage - get cover image
+func (s *TitleInfo) Coverpage() *InlineImage {
 	return s.coverpage
 }
 
-func (s *titleInfo) CreateCoverpage(href, ctype, alt string) *inlineImage {
-	img := &inlineImage{}
+//CreateCoverpage - create and return new image
+func (s *TitleInfo) CreateCoverpage(href, ctype, alt string) *InlineImage {
+	img := &InlineImage{}
 	img.href = href
 	img.ctype = ctype
 	img.alt = alt
@@ -105,25 +107,30 @@ func (s *titleInfo) CreateCoverpage(href, ctype, alt string) *inlineImage {
 	return img
 }
 
-func (s *titleInfo) Date() *date {
+//Date - Date this book was written, can be not exact, e.g. 1863-1867. If an optional attribute is present, then it should contain some computer-readable date from the interval for use by search and indexingengines
+func (s *TitleInfo) Date() *Date {
 	return s.date
 }
 
-func (s *titleInfo) SetDate(dt time.Time) {
-	d := date(dt)
+//SetDate - set date this book was written
+func (s *TitleInfo) SetDate(dt time.Time) {
+	d := Date(dt)
 	s.date = &d
 }
 
-func (s *titleInfo) Annotation() *annotation {
+//Annotation - get annotation
+func (s *TitleInfo) Annotation() *Annotation {
 	return s.annotation
 }
 
-func (s *titleInfo) CreateAnnotation() *annotation {
-	s.annotation = &annotation{}
+//CreateAnnotation - create and return new Annotation; old value will be dropped
+func (s *TitleInfo) CreateAnnotation() *Annotation {
+	s.annotation = &Annotation{}
 	return s.annotation
 }
 
-func (s *titleInfo) AddKeywords(keywords ...string) {
+//AddKeywords - add keywords to list
+func (s *TitleInfo) AddKeywords(keywords ...string) {
 	if s.keywords == nil {
 		s.keywords = keywords
 	} else {
@@ -131,39 +138,44 @@ func (s *titleInfo) AddKeywords(keywords ...string) {
 	}
 }
 
-func (s *titleInfo) BookTitle() string {
+//BookTitle - get book title
+func (s *TitleInfo) BookTitle() string {
 	return s.bookTitle
 }
 
-func (s *titleInfo) SetBookTitle(bookTitle string) {
+//SetBookTitle - set book title
+func (s *TitleInfo) SetBookTitle(bookTitle string) {
 	s.bookTitle = bookTitle
 }
 
-func (s *titleInfo) Genres() []Genre {
+//Genres - get list of genres
+func (s *TitleInfo) Genres() []Genre {
 	if s.genres == nil {
 		s.genres = []Genre{}
 	}
 	return s.genres
 }
 
-func (s *titleInfo) AddGenre(genre Genre) []Genre {
+//AddGenre - add new genre to list and return modified list
+func (s *TitleInfo) AddGenre(genre Genre) []Genre {
 	s.genres = append(s.Genres(), genre)
 	return s.genres
 }
 
-func (s *titleInfo) Authors() []*author {
+//Authors - get list of book authors
+func (s *TitleInfo) Authors() []*Author {
 	if s.authors == nil {
-		s.authors = []*author{}
+		s.authors = []*Author{}
 	}
 	return s.authors
 }
 
-func (s *titleInfo) CreateAuthor(firstName, middleName, lastName string) *author {
-	author := &author{
+//CreateAuthor - create new Author from given field, add it to list of author and return
+func (s *TitleInfo) CreateAuthor(firstName, middleName, lastName string) *Author {
+	author := &Author{
 		firstName:  firstName,
 		middleName: []string{},
 		lastName:   lastName,
-		book:       s.book,
 	}
 	if middleName != "" {
 		author.middleName = []string{middleName}
@@ -172,7 +184,8 @@ func (s *titleInfo) CreateAuthor(firstName, middleName, lastName string) *author
 	return author
 }
 
-func (s *titleInfo) ToXML() (string, error) { // nolint: gocyclo
+//ToXML - export to XML string
+func (s *TitleInfo) ToXML() (string, error) { // nolint: gocyclo
 	b := s.builder()
 	b.Reset()
 	b.openTag(s.tag())
@@ -210,7 +223,7 @@ func (s *titleInfo) ToXML() (string, error) { // nolint: gocyclo
 	return b.String(), nil
 }
 
-func (s *titleInfo) serializeSequences() error {
+func (s *TitleInfo) serializeSequences() error {
 	if s.sequences != nil {
 		for _, tr := range s.sequences {
 			str, err := tr.ToXML()
@@ -223,7 +236,7 @@ func (s *titleInfo) serializeSequences() error {
 	return nil
 }
 
-func (s *titleInfo) serializeTranslators() error {
+func (s *TitleInfo) serializeTranslators() error {
 	if s.translators != nil {
 		for _, tr := range s.translators {
 			str, err := tr.ToXML()
@@ -236,12 +249,12 @@ func (s *titleInfo) serializeTranslators() error {
 	return nil
 }
 
-func (s *titleInfo) serializeSrcLang() error {
+func (s *TitleInfo) serializeSrcLang() error {
 	s.builder().makeTag("src-lang", s.lang)
 	return nil
 }
 
-func (s *titleInfo) serializeLang() error {
+func (s *TitleInfo) serializeLang() error {
 	if s.lang == "" {
 		return makeError(ErrEmptyField, "Empty required %s/lang", s.tag())
 	}
@@ -249,7 +262,7 @@ func (s *titleInfo) serializeLang() error {
 	return nil
 }
 
-func (s *titleInfo) serializeCoverpage() error {
+func (s *TitleInfo) serializeCoverpage() error {
 	if s.coverpage != nil {
 		str, err := s.coverpage.ToXML()
 		if err != nil {
@@ -260,7 +273,7 @@ func (s *titleInfo) serializeCoverpage() error {
 	return nil
 }
 
-func (s *titleInfo) serializeDate() error {
+func (s *TitleInfo) serializeDate() error {
 	if s.date != nil {
 		str, err := s.date.ToXML()
 		if err != nil {
@@ -271,14 +284,14 @@ func (s *titleInfo) serializeDate() error {
 	return nil
 }
 
-func (s *titleInfo) serializeKeywords() error {
+func (s *TitleInfo) serializeKeywords() error {
 	if s.keywords != nil && len(s.keywords) > 0 {
 		s.builder().makeTag("keywords", strings.Join(s.keywords, ","))
 	}
 	return nil
 }
 
-func (s *titleInfo) serializeAnnotation() error {
+func (s *TitleInfo) serializeAnnotation() error {
 	if s.annotation != nil {
 		str, err := s.annotation.ToXML()
 		if err != nil {
@@ -289,7 +302,7 @@ func (s *titleInfo) serializeAnnotation() error {
 	return nil
 }
 
-func (s *titleInfo) serializeGenres() error {
+func (s *TitleInfo) serializeGenres() error {
 	if s.genres == nil || len(s.genres) == 0 {
 		return makeError(ErrEmptyField, "Empty required field %s/genre", s.tag())
 	}
@@ -299,7 +312,7 @@ func (s *titleInfo) serializeGenres() error {
 	return nil
 }
 
-func (s *titleInfo) serializeAuthors() error {
+func (s *TitleInfo) serializeAuthors() error {
 	if s.authors == nil || len(s.authors) == 0 {
 		return makeError(ErrEmptyField, "Empty required field %s/author", s.tag())
 	}
@@ -314,7 +327,7 @@ func (s *titleInfo) serializeAuthors() error {
 	return nil
 }
 
-func (s *titleInfo) serializeBookTitle() error {
+func (s *TitleInfo) serializeBookTitle() error {
 	if s.bookTitle == "" {
 		return makeError(ErrEmptyField, "Empty required field %s/book-title", s.tag())
 	}
@@ -322,6 +335,6 @@ func (s *titleInfo) serializeBookTitle() error {
 	return nil
 }
 
-func (s *titleInfo) tag() string {
+func (s *TitleInfo) tag() string {
 	return "title-info"
 }

@@ -1,33 +1,37 @@
 package gofbwriter
 
-//A citation with an optional citation author at the end
-type cite struct {
+//Cite - a citation with an optional citation author at the end
+type Cite struct {
 	b           *builder
 	id          string
-	items       []fb
+	items       []Fb
 	textAuthors []string
 }
 
-func (s *cite) builder() *builder {
+func (s *Cite) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *cite) ID() string {
+//ID - get ID attribute
+func (s *Cite) ID() string {
 	return s.id
 }
 
-func (s *cite) SetID(id string) {
+//SetID - set ID attribute
+func (s *Cite) SetID(id string) {
 	s.id = id
 }
 
-func (s *cite) TextAuthors() []string {
+//TextAuthors - get list of authors
+func (s *Cite) TextAuthors() []string {
 	return s.textAuthors
 }
 
-func (s *cite) AddTextAuthor(textAuthor string) {
+//AddTextAuthor - add new text author to list of authors
+func (s *Cite) AddTextAuthor(textAuthor string) {
 	if s.textAuthors == nil {
 		s.textAuthors = []string{textAuthor}
 	} else {
@@ -35,59 +39,64 @@ func (s *cite) AddTextAuthor(textAuthor string) {
 	}
 }
 
-func (s *cite) AddParagraph(par string) *p {
+//AddParagraph - add new paragraph to cite
+func (s *Cite) AddParagraph(par string) {
 	item := &p{text: par}
 	_ = s.AppendItem(item)
-	return item
 }
 
-func (s *cite) CreatePoem() *poem {
-	item := &poem{}
+//CreatePoem - create and return new poem
+func (s *Cite) CreatePoem() *Poem {
+	item := &Poem{}
 	_ = s.AppendItem(item)
 	return item
 }
 
-func (s *cite) CreateEmptyLine() {
+//AddEmptyLine - add new empty line to cite
+func (s *Cite) AddEmptyLine() {
 	_ = s.AppendItem(&empty{})
 }
 
-func (s *cite) CreateSubtitle(text string) *p {
+//AddSubtitle - add new subtitle to cite
+func (s *Cite) AddSubtitle(text string) {
 	item := &p{tagName: "subtitle", text: text}
 	_ = s.AppendItem(item)
-	return item
 }
 
-func (s *cite) CreateTable() *table {
-	item := &table{}
+//CreateTable - create and return new table
+func (s *Cite) CreateTable() *Table {
+	item := &Table{}
 	_ = s.AppendItem(item)
 	return item
 }
 
-func (s *cite) AppendItem(item fb) error {
+//AppendItem - append existing item to cite
+func (s *Cite) AppendItem(item Fb) error {
 	pass := false
 	if _, ok := item.(*p); ok {
 		pass = true
-	} else if _, ok := item.(*poem); ok {
+	} else if _, ok := item.(*Poem); ok {
 		pass = true
 	} else if _, ok := item.(*p); ok {
 		pass = true
 	} else if _, ok := item.(*empty); ok {
 		pass = true
-	} else if _, ok := item.(*table); ok {
+	} else if _, ok := item.(*Table); ok {
 		pass = true
 	}
 	if !pass {
 		return makeError(ErrUnsupportedNestedItem, "Can't use type %T in cite", item)
 	}
 	if s.items == nil {
-		s.items = []fb{item}
+		s.items = []Fb{item}
 	} else {
 		s.items = append(s.items, item)
 	}
 	return nil
 }
 
-func (s *cite) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *Cite) ToXML() (string, error) {
 	b := s.builder()
 	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"id": s.id}, false)
@@ -105,6 +114,6 @@ func (s *cite) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *cite) tag() string {
+func (s *Cite) tag() string {
 	return "cite"
 }

@@ -1,73 +1,84 @@
 package gofbwriter
 
-type inlineImage struct {
+//InlineImage - simple image type
+type InlineImage struct {
 	b     *builder
 	alt   string
 	ctype string
 	href  string
 }
 
-func (i *inlineImage) builder() *builder {
+func (i *InlineImage) builder() *builder {
 	if i.b == nil {
 		i.b = &builder{}
 	}
 	return i.b
 }
 
-//An empty element with an image name as an attribute
-type image struct {
-	inlineImage
+//Image - an empty element with an image name as an attribute
+type Image struct {
+	InlineImage
 	title string
 }
 
-func (i *inlineImage) Href() string {
+//Href - get href attribute
+func (i *InlineImage) Href() string {
 	return i.href
 }
 
-func (i *inlineImage) SetHref(href string) {
+//SetHref - set href attribute
+func (i *InlineImage) SetHref(href string) {
 	i.href = href
 }
 
-func (i *inlineImage) Ctype() string {
+//Ctype - get type attribute
+func (i *InlineImage) Ctype() string {
 	return i.ctype
 }
 
-func (i *inlineImage) SetCtype(ctype string) {
+//SetCtype - set type attribute
+func (i *InlineImage) SetCtype(ctype string) {
 	i.ctype = ctype
 }
 
-func (i *inlineImage) Alt() string {
+//Alt - get alt attribute
+func (i *InlineImage) Alt() string {
 	return i.alt
 }
 
-func (i *inlineImage) SetAlt(alt string) {
+//SetAlt - set alt attribute
+func (i *InlineImage) SetAlt(alt string) {
 	i.alt = alt
 }
 
-func (i *image) Title() string {
+//Title - get title attribute
+func (i *Image) Title() string {
 	return i.title
 }
 
-func (i *image) SetTitle(title string) {
+//SetTitle - set title attribute
+func (i *Image) SetTitle(title string) {
 	i.title = title
 }
 
-func (i *inlineImage) ToXML() (string, error) {
+//ToXML - export to XML string
+func (i *InlineImage) ToXML() (string, error) {
 	i.builder().Reset()
 	i.builder().makeTagAttr(i.tag(), "", map[string]string{"ctype": i.ctype, "alt": i.alt, "href": i.href}, false)
 	return i.builder().String(), nil
 }
 
-func (i *image) ToXML() (string, error) {
+//ToXML - export to XML string
+func (i *Image) ToXML() (string, error) {
 	i.builder().Reset()
 	i.builder().makeTagAttr(i.tag(), "", map[string]string{"ctype": i.ctype, "alt": i.alt, "href": i.href, "title": i.title}, false)
 	return i.builder().String(), nil
 }
 
-func (i *inlineImage) tag() string {
+func (i *InlineImage) tag() string {
 	return "image"
 }
 
-func (i *image) tag() string {
+func (i *Image) tag() string {
 	return "image"
 }

@@ -1,25 +1,27 @@
 package gofbwriter
 
-type stylesheet struct {
+//StyleSheet - This element contains an arbitrary stylesheet that is intepreted by a some processing programs, e.g. text/css stylesheets can be used by XSLT stylesheets to generate better looking html
+type StyleSheet struct {
 	b     *builder
 	ctype string
 	data  string
-	book  *book
 }
 
-func (s *stylesheet) builder() *builder {
+func (s *StyleSheet) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *stylesheet) Set(ctype, data string) {
+//Set - set content-type and data for this stylesheet
+func (s *StyleSheet) Set(ctype, data string) {
 	s.ctype = ctype
 	s.data = data
 }
 
-func (s *stylesheet) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *StyleSheet) ToXML() (string, error) {
 	b := s.builder()
 	b.Reset()
 	b.openTagAttr(s.tag(), map[string]string{"type": s.ctype}, false)
@@ -28,6 +30,6 @@ func (s *stylesheet) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *stylesheet) tag() string {
+func (s *StyleSheet) tag() string {
 	return "stylesheet"
 }

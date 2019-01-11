@@ -7,8 +7,8 @@ import (
 )
 
 //NewBook - creates new empty book
-func NewBook() *book { // nolint: golint
-	return &book{}
+func NewBook() *Fb2 { // nolint: golint
+	return &Fb2{}
 }
 
 type builder struct {

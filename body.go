@@ -1,87 +1,99 @@
 package gofbwriter
 
-//Main content of the book, multiple bodies are used for additional information, like footnotes, that do not appear in the main book flow (extended from this class). The first body is presented to the reader by default, and content in the other bodies should be accessible by hyperlinks.
-type body struct {
+//Body - main content of the book, multiple bodies are used for additional information, like footnotes, that do not appear in the main book flow (extended from this class). The first body is presented to the reader by default, and content in the other bodies should be accessible by hyperlinks.
+type Body struct {
 	b         *builder
-	image     *image      //Image to be displayed at the top of this section
-	title     *title      //A fancy title for the entire book, should be used if the simple text version in &lt;description&gt; is not adequate, e.g. the book title has multiple paragraphs and/or character styles
-	epigraphs []*epigraph //Epigraph(s) for the entire book, if any
-	sections  []*section
+	image     *Image      //Image to be displayed at the top of this section
+	title     *Title      //A fancy title for the entire book, should be used if the simple text version in &lt;description&gt; is not adequate, e.g. the book title has multiple paragraphs and/or character styles
+	epigraphs []*Epigraph //Epigraph(s) for the entire book, if any
+	sections  []*Section
 	name      string
-	book      *book
 }
 
-func (s *body) builder() *builder {
+func (s *Body) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *body) Sections() []*section {
+//Sections - get list of sections
+func (s *Body) Sections() []*Section {
 	return s.sections
 }
 
-func (s *body) AddSection(sec *section) {
+//AddSection - add existing section to list of sections
+func (s *Body) AddSection(sec *Section) {
 	if s.sections == nil {
-		s.sections = []*section{sec}
+		s.sections = []*Section{sec}
 	} else {
 		s.sections = append(s.sections, sec)
 	}
 }
 
-func (s *body) CreateSection() *section {
-	sec := &section{}
+//CreateSection - create new Section and add it to list of sections, return created struct
+func (s *Body) CreateSection() *Section {
+	sec := &Section{}
 	s.AddSection(sec)
 	return sec
 }
 
-func (s *body) Epigraphs() []*epigraph {
+//Epigraphs - get list of epigraphs
+func (s *Body) Epigraphs() []*Epigraph {
 	return s.epigraphs
 }
 
-func (s *body) AddEpigraph(ep *epigraph) {
+//AddEpigraph - add existing Epigraph to list
+func (s *Body) AddEpigraph(ep *Epigraph) {
 	if s.epigraphs == nil {
-		s.epigraphs = []*epigraph{ep}
+		s.epigraphs = []*Epigraph{ep}
 	} else {
 		s.epigraphs = append(s.epigraphs, ep)
 	}
 }
 
-func (s *body) CreateEpigraph() *epigraph {
-	ep := &epigraph{}
+//CreateEpigraph - create new Epigraph, add it to list and return
+func (s *Body) CreateEpigraph() *Epigraph {
+	ep := &Epigraph{}
 	s.AddEpigraph(ep)
 	return ep
 }
 
-func (s *body) Title() *title {
+//Title - get Title
+func (s *Body) Title() *Title {
 	return s.title
 }
 
-func (s *body) SetTitle(title *title) {
+//SetTitle - set existing Title
+func (s *Body) SetTitle(title *Title) {
 	s.title = title
 }
 
-func (s *body) CreateTitle() *title {
-	s.title = &title{}
+//CreateTitle - create and return new Title. Old title will be dropped
+func (s *Body) CreateTitle() *Title {
+	s.title = &Title{}
 	return s.title
 }
 
-func (s *body) Image() *image {
+//Image - get Image
+func (s *Body) Image() *Image {
 	return s.image
 }
 
-func (s *body) CreateImage() *image {
-	img := &image{}
+//CreateImage - create and return new Image. Old image will be dropped
+func (s *Body) CreateImage() *Image {
+	img := &Image{}
 	s.image = img
 	return img
 }
 
-func (s *body) SetImage(image *image) {
+//SetImage - set existing Image
+func (s *Body) SetImage(image *Image) {
 	s.image = image
 }
 
-func (s *body) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *Body) ToXML() (string, error) {
 	if s.sections == nil || len(s.sections) == 0 {
 		return "", makeError(ErrEmptyField, "Empty required field %s/section", s.tag())
 	}
@@ -104,7 +116,7 @@ func (s *body) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *body) serializeImage() error {
+func (s *Body) serializeImage() error {
 	if s.image != nil {
 		i, err := s.image.ToXML()
 		if err != nil {
@@ -115,7 +127,7 @@ func (s *body) serializeImage() error {
 	return nil
 }
 
-func (s *body) serializeTitle() error {
+func (s *Body) serializeTitle() error {
 	if s.title != nil {
 		t, err := s.title.ToXML()
 		if err != nil {
@@ -126,7 +138,7 @@ func (s *body) serializeTitle() error {
 	return nil
 }
 
-func (s *body) serializeEpigraphs() error {
+func (s *Body) serializeEpigraphs() error {
 	if s.epigraphs != nil && len(s.epigraphs) > 0 {
 		for _, ep := range s.epigraphs {
 			str, err := ep.ToXML()
@@ -139,7 +151,7 @@ func (s *body) serializeEpigraphs() error {
 	return nil
 }
 
-func (s *body) serializeSections() error {
+func (s *Body) serializeSections() error {
 	for _, sec := range s.sections {
 		str, err := sec.ToXML()
 		if err != nil {
@@ -150,6 +162,6 @@ func (s *body) serializeSections() error {
 	return nil
 }
 
-func (s *body) tag() string {
+func (s *Body) tag() string {
 	return "body"
 }

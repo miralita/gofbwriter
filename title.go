@@ -4,36 +4,39 @@ import (
 	"fmt"
 )
 
-//A title, used in sections, poems and body elements
-type title struct {
+//Title - a title, used in sections, poems and body elements
+type Title struct {
 	b     *builder
-	items []fb
+	items []Fb
 }
 
-func (s *title) builder() *builder {
+func (s *Title) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *title) CreateParagraph(str string) {
+//AddParagraph - add new paragraph
+func (s *Title) AddParagraph(str string) {
 	s.appendItem(&p{text: str})
 }
 
-func (s *title) appendItem(i fb) {
+func (s *Title) appendItem(i Fb) {
 	if s.items == nil {
-		s.items = []fb{i}
+		s.items = []Fb{i}
 	} else {
 		s.items = append(s.items, i)
 	}
 }
 
-func (s *title) CreateEmptyline() {
+//AddEmptyLine - add new empty line
+func (s *Title) AddEmptyLine() {
 	s.appendItem(&empty{})
 }
 
-func (s *title) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *Title) ToXML() (string, error) {
 	if s.items == nil || len(s.items) == 0 {
 		return fmt.Sprintf("<%s />\n", s.tag()), nil
 	}
@@ -51,6 +54,6 @@ func (s *title) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *title) tag() string {
+func (s *Title) tag() string {
 	return "title"
 }

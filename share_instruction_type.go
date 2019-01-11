@@ -1,23 +1,24 @@
 package gofbwriter
 
-//In-document instruction for generating output free and payed documents
-type shareInstructionType struct {
+//ShareInstruction - In-document instruction for generating output free and payed documents
+type ShareInstruction struct {
 	b       *builder
 	tagName string
 }
 
-func (s *shareInstructionType) builder() *builder {
+func (s *ShareInstruction) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (*shareInstructionType) ToXML() (string, error) {
+//ToXML - export to XML string
+func (*ShareInstruction) ToXML() (string, error) {
 	panic("implement me")
 }
 
-func (s *shareInstructionType) tag() string {
+func (s *ShareInstruction) tag() string {
 	if s.tagName == "" {
 		s.tagName = "share-instruction-type"
 	}

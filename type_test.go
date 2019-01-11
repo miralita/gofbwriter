@@ -7,32 +7,32 @@ import (
 )
 
 func TestInterface(t *testing.T) {
-	var v fb
-	v = &annotation{}
+	var v Fb
+	v = &Annotation{}
 	assert.Equal(t, "annotation", v.tag(), "Should be annotation")
 	t.Log(v.tag())
-	v = &author{}
+	v = &Author{}
 	t.Log(v.tag())
-	v = &binary{}
+	v = &Binary{}
 	t.Log(v.tag())
-	v = &body{}
+	v = &Body{}
 	t.Log(v.tag())
-	v = &book{}
+	v = &Fb2{}
 	t.Log(v.tag())
-	v = &cite{}
+	v = &Cite{}
 	t.Log(v.tag())
-	v = &customInfo{}
+	v = &CustomInfo{}
 	t.Log(v.tag())
-	tmp := date(time.Now())
+	tmp := Date(time.Now())
 	v = &tmp
 	t.Log(v.tag())
-	v = &description{}
+	v = &Description{}
 	t.Log(v.tag())
-	v = &documentInfo{}
+	v = &DocumentInfo{}
 	t.Log(v.tag())
-	v = &epigraph{}
+	v = &Epigraph{}
 	t.Log(v.tag())
-	v = &image{}
+	v = &Image{}
 	t.Log(v.tag())
 	v = &empty{}
 	t.Log(v.tag())
@@ -40,24 +40,24 @@ func TestInterface(t *testing.T) {
 	t.Log(v.tag())
 	v = &partShareInstructionType{}
 	t.Log(v.tag())
-	v = &poem{}
+	v = &Poem{}
 	t.Log(v.tag())
-	v = &publishInfo{}
+	v = &PublishInfo{}
 	t.Log(v.tag())
-	v = &section{}
+	v = &Section{}
 	t.Log(v.tag())
-	v = &sequence{}
+	v = &Sequence{}
 	t.Log(v.tag())
-	v = &shareInstructionType{}
+	v = &ShareInstruction{}
 	t.Log(v.tag())
-	v = &stanza{}
+	v = &Stanza{}
 	t.Log(v.tag())
-	v = &stylesheet{}
+	v = &StyleSheet{}
 	t.Log(v.tag())
-	v = &table{}
+	v = &Table{}
 	t.Log(v.tag())
-	v = &title{}
+	v = &Title{}
 	t.Log(v.tag())
-	v = &titleInfo{}
+	v = &TitleInfo{}
 	t.Log(v.tag())
 }

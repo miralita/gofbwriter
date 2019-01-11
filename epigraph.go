@@ -4,49 +4,38 @@ import (
 	"fmt"
 )
 
-//An epigraph
-/*<xs:complexType name="epigraphType">
-  <xs:annotation>
-    <xs:documentation>An epigraph</xs:documentation>
-  </xs:annotation>
-  <xs:sequence>
-    <xs:choice minOccurs="0" maxOccurs="unbounded">
-      <xs:element name="p" type="pType"/>
-      <xs:element name="poem" type="poemType"/>
-      <xs:element name="cite" type="citeType"/>
-      <xs:element name="empty-line"/>
-    </xs:choice>
-    <xs:element name="text-author" type="pType" minOccurs="0" maxOccurs="unbounded"/>
-  </xs:sequence>
-  <xs:attribute name="id" type="xs:ID" use="optional"/>
-</xs:complexType>*/
-type epigraph struct {
+//Epigraph - An epigraph
+type Epigraph struct {
 	b           *builder
 	textAuthors []string
-	items       []fb
+	items       []Fb
 	id          string
 }
 
-func (s *epigraph) ID() string {
+//ID - get ID attribute
+func (s *Epigraph) ID() string {
 	return s.id
 }
 
-func (s *epigraph) SetID(id string) {
+//SetID - set ID attribute
+func (s *Epigraph) SetID(id string) {
 	s.id = id
 }
 
-func (s *epigraph) builder() *builder {
+func (s *Epigraph) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *epigraph) TextAuthors() []string {
+//TextAuthors - get list of authors
+func (s *Epigraph) TextAuthors() []string {
 	return s.textAuthors
 }
 
-func (s *epigraph) AddAuthor(author string) {
+//AddAuthor - add author name to the list of authors
+func (s *Epigraph) AddAuthor(author string) {
 	if s.textAuthors == nil {
 		s.textAuthors = []string{author}
 	} else {
@@ -54,35 +43,39 @@ func (s *epigraph) AddAuthor(author string) {
 	}
 }
 
-func (s *epigraph) CreateParagraph(str string) *p {
+//AddParagraph - add new paragraph to epigraph
+func (s *Epigraph) AddParagraph(str string) {
 	p := &p{text: str}
 	_ = s.AppendItem(p)
-	return p
 }
 
-func (s *epigraph) CreateEmptyLine() {
+//AddEmptyLine - add empty-line tag
+func (s *Epigraph) AddEmptyLine() {
 	_ = s.AppendItem(&empty{})
 }
 
-func (s *epigraph) CreatePoem() *poem {
-	p := &poem{}
+//CreatePoem - create new Poem, add it to list and return
+func (s *Epigraph) CreatePoem() *Poem {
+	p := &Poem{}
 	_ = s.AppendItem(p)
 	return p
 }
 
-func (s *epigraph) CreateCite() *cite {
-	p := &cite{}
+//CreateCite - create new Cite, add it to list and return
+func (s *Epigraph) CreateCite() *Cite {
+	p := &Cite{}
 	_ = s.AppendItem(p)
 	return p
 }
 
-func (s *epigraph) AppendItem(item fb) error {
+//AppendItem - append item to list of items
+func (s *Epigraph) AppendItem(item Fb) error {
 	pass := false
 	if _, ok := item.(*p); ok {
 		pass = true
-	} else if _, ok := item.(*poem); ok {
+	} else if _, ok := item.(*Poem); ok {
 		pass = true
-	} else if _, ok := item.(*cite); ok {
+	} else if _, ok := item.(*Cite); ok {
 		pass = true
 	} else if _, ok := item.(*empty); ok {
 		pass = true
@@ -91,14 +84,15 @@ func (s *epigraph) AppendItem(item fb) error {
 		return makeError(ErrUnsupportedNestedItem, "Can't use type %T in epigraph", item)
 	}
 	if s.items == nil {
-		s.items = []fb{item}
+		s.items = []Fb{item}
 	} else {
 		s.items = append(s.items, item)
 	}
 	return nil
 }
 
-func (s *epigraph) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *Epigraph) ToXML() (string, error) {
 	if (s.items == nil || len(s.items) == 0) && (s.textAuthors == nil || len(s.textAuthors) == 0) {
 		return fmt.Sprintf("<%s />\n", s.tag()), nil
 	}
@@ -123,6 +117,6 @@ func (s *epigraph) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *epigraph) tag() string {
+func (s *Epigraph) tag() string {
 	return "epigraph"
 }

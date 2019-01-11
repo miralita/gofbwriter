@@ -1,96 +1,109 @@
 package gofbwriter
 
-type description struct {
+//Description - description of the book
+type Description struct {
 	b *builder
 	//Generic information about the book
-	titleInfo *titleInfo
+	titleInfo *TitleInfo
 	//Generic information about the original book (for translations)
-	srcTitleInfo *titleInfo
+	srcTitleInfo *TitleInfo
 	//Information about this particular (xml) document
-	documentInfo *documentInfo
+	documentInfo *DocumentInfo
 	//Information about some paper/outher published document, that was used as a source of this xml document
-	publishInfo *publishInfo
+	publishInfo *PublishInfo
 	//Any other information about the book/document that didnt fit in the above groups
-	customInfo []*customInfo
+	customInfo []*CustomInfo
 	//Describes, how the document should be presented to end-user, what parts are free, what parts should be sold and what price should be used
-	output []*shareInstructionType
-	book   *book
+	output []*ShareInstruction
 }
 
-func (s *description) builder() *builder {
+func (s *Description) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *description) Output() []*shareInstructionType {
+//Output - Describes, how the document should be presented to end-user, what parts are free, what parts should be sold and what price should be used
+func (s *Description) Output() []*ShareInstruction {
 	return s.output
 }
 
-func (s *description) CreateOutput() (*shareInstructionType, error) {
+//CreateOutput - create new ShareInstruction, add it to list of outputs and return
+func (s *Description) CreateOutput() (*ShareInstruction, error) {
 	if s.output != nil && len(s.output) >= 2 {
 		return nil, makeError(ErrToManyItems, "Can't create new description/output: max occurs = 2")
 	}
-	sit := &shareInstructionType{tagName: "output"}
+	sit := &ShareInstruction{tagName: "output"}
 	if s.output == nil {
-		s.output = []*shareInstructionType{sit}
+		s.output = []*ShareInstruction{sit}
 	} else {
 		s.output = append(s.output, sit)
 	}
 	return sit, nil
 }
 
-func (s *description) CustomInfo() []*customInfo {
+//CustomInfo - Any other information about the book/document that didnt fit in the above groups
+func (s *Description) CustomInfo() []*CustomInfo {
 	return s.customInfo
 }
 
-func (s *description) AddCustomInfo(infoType, value string) {
-	info := &customInfo{info: value, infoType: infoType}
+//AddCustomInfo - add new CustomInfo to list
+func (s *Description) AddCustomInfo(infoType, value string) {
+	info := &CustomInfo{info: value, infoType: infoType}
 	if s.customInfo == nil {
-		s.customInfo = []*customInfo{info}
+		s.customInfo = []*CustomInfo{info}
 	} else {
 		s.customInfo = append(s.customInfo, info)
 	}
 }
 
-func (s *description) PublishInfo() *publishInfo {
+//PublishInfo - Information about some paper/outher published document, that was used as a source of this xml document
+func (s *Description) PublishInfo() *PublishInfo {
 	return s.publishInfo
 }
 
-func (s *description) CreatePublishInfo() *publishInfo {
-	s.publishInfo = &publishInfo{}
+//CreatePublishInfo - create and return new PublishInfo. Old PublishInfo will be dropped
+func (s *Description) CreatePublishInfo() *PublishInfo {
+	s.publishInfo = &PublishInfo{}
 	return s.publishInfo
 }
 
-func (s *description) DocumentInfo() *documentInfo {
+//DocumentInfo - Information about this particular (xml) document
+func (s *Description) DocumentInfo() *DocumentInfo {
 	return s.documentInfo
 }
 
-func (s *description) CreateDocumentInfo() *documentInfo {
-	s.documentInfo = &documentInfo{}
+//CreateDocumentInfo - create and return new DocumentInfo. Old DocumentInfo will be dropped
+func (s *Description) CreateDocumentInfo() *DocumentInfo {
+	s.documentInfo = &DocumentInfo{}
 	return s.documentInfo
 }
 
-func (s *description) SrcTitleInfo() *titleInfo {
+//SrcTitleInfo - Generic information about the original book (for translations)
+func (s *Description) SrcTitleInfo() *TitleInfo {
 	return s.srcTitleInfo
 }
 
-func (s *description) CreateSrcTitleInfo() *titleInfo {
-	s.srcTitleInfo = &titleInfo{tagName: "src-title-info"}
+//CreateSrcTitleInfo - create and return new src-title-info. Old value will be dropped
+func (s *Description) CreateSrcTitleInfo() *TitleInfo {
+	s.srcTitleInfo = &TitleInfo{tagName: "src-title-info"}
 	return s.srcTitleInfo
 }
 
-func (s *description) TitleInfo() *titleInfo {
+//TitleInfo - Generic information about the book
+func (s *Description) TitleInfo() *TitleInfo {
 	return s.titleInfo
 }
 
-func (s *description) CreateTitleInfo() *titleInfo {
-	s.titleInfo = &titleInfo{}
+//CreateTitleInfo - create and return new title-info. Old value will be dropped
+func (s *Description) CreateTitleInfo() *TitleInfo {
+	s.titleInfo = &TitleInfo{}
 	return s.titleInfo
 }
 
-func (s *description) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *Description) ToXML() (string, error) {
 	b := s.builder()
 	b.Reset()
 	b.openTag(s.tag())
@@ -116,7 +129,7 @@ func (s *description) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *description) serializeOutput() error {
+func (s *Description) serializeOutput() error {
 	if s.output != nil {
 		for _, o := range s.output {
 			str, err := o.ToXML()
@@ -129,7 +142,7 @@ func (s *description) serializeOutput() error {
 	return nil
 }
 
-func (s *description) serializeCustomInfo() error {
+func (s *Description) serializeCustomInfo() error {
 	if s.customInfo != nil {
 		for _, i := range s.customInfo {
 			str, err := i.ToXML()
@@ -142,7 +155,7 @@ func (s *description) serializeCustomInfo() error {
 	return nil
 }
 
-func (s *description) serializePublishInfo() error {
+func (s *Description) serializePublishInfo() error {
 	if s.publishInfo == nil {
 		return makeError(ErrEmptyField, "Empty required %s/publish-info", s.tag())
 	}
@@ -154,7 +167,7 @@ func (s *description) serializePublishInfo() error {
 	return nil
 }
 
-func (s *description) serializeDocumentInfo() error {
+func (s *Description) serializeDocumentInfo() error {
 	if s.documentInfo == nil {
 		return makeError(ErrEmptyField, "Empty required %s/document-info", s.tag())
 	}
@@ -166,7 +179,7 @@ func (s *description) serializeDocumentInfo() error {
 	return nil
 }
 
-func (s *description) serializeSrcTitleInfo() error {
+func (s *Description) serializeSrcTitleInfo() error {
 	if s.srcTitleInfo != nil {
 		str, err := s.srcTitleInfo.ToXML()
 		if err != nil {
@@ -177,7 +190,7 @@ func (s *description) serializeSrcTitleInfo() error {
 	return nil
 }
 
-func (s *description) serializeTitleInfo() error {
+func (s *Description) serializeTitleInfo() error {
 	if s.titleInfo == nil {
 		return makeError(ErrEmptyField, "Empty required %s/title-info", s.tag())
 	}
@@ -189,6 +202,6 @@ func (s *description) serializeTitleInfo() error {
 	return nil
 }
 
-func (s *description) tag() string {
+func (s *Description) tag() string {
 	return "description"
 }

@@ -6,15 +6,15 @@ import (
 	"time"
 )
 
-//Information about this particular (xml) document
-type documentInfo struct {
+//DocumentInfo - Information about this particular (xml) document
+type DocumentInfo struct {
 	b *builder
 	//Author(s) of this particular document
-	authors []*author
+	authors []*Author
 	//Any software used in preparation of this document, in free format
 	programUsed string
 	//Date this document was created, same guidelines as in the &lt;title-info&gt; section apply
-	date *date
+	date *Date
 	//Source URL if this document is a conversion of some other (online) document
 	srcUrls []string
 	//URL of the original (online) document, if this is a conversion
@@ -24,80 +24,93 @@ type documentInfo struct {
 	//Document version, in free format, should be incremented if the document is changed and re-released to the public
 	version float32
 	//Short description for all changes made to this document, like "Added missing chapter 6", in free form.
-	history []*annotation
+	history []*Annotation
 	//Owner of the fb2 document copyrights
-	publishers []*author
+	publishers []*Author
 }
 
-func (s *documentInfo) builder() *builder {
+func (s *DocumentInfo) builder() *builder {
 	if s.b == nil {
 		s.b = &builder{}
 	}
 	return s.b
 }
 
-func (s *documentInfo) Publishers() []*author {
+//Publishers - Owner of the fb2 document copyrights
+func (s *DocumentInfo) Publishers() []*Author {
 	return s.publishers
 }
 
-func (s *documentInfo) CreatePublisher() *author {
-	a := &author{tagName: "publisher"}
+//CreatePublisher - create new Author, add to list of publishers and return
+func (s *DocumentInfo) CreatePublisher() *Author {
+	a := &Author{tagName: "publisher"}
 	s.AddPublisher(a)
 	return a
 }
 
-func (s *documentInfo) AddPublisher(publisher *author) {
+//AddPublisher - add existing author to publishers
+func (s *DocumentInfo) AddPublisher(publisher *Author) {
 	if s.publishers == nil {
-		s.publishers = []*author{publisher}
+		s.publishers = []*Author{publisher}
 	} else {
 		s.publishers = append(s.publishers, publisher)
 	}
 }
 
-func (s *documentInfo) History() []*annotation {
+//History - Short description for all changes made to this document, like "Added missing chapter 6", in free form.
+func (s *DocumentInfo) History() []*Annotation {
 	return s.history
 }
 
-func (s *documentInfo) AddHistory(descr string) *annotation {
-	d := &annotation{tagName: "history"}
+//AddHistory - add single record to history; return created Annotation struct
+func (s *DocumentInfo) AddHistory(descr string) *Annotation {
+	d := &Annotation{tagName: "history"}
 	d.AddParagraph(descr)
 	if s.history == nil {
-		s.history = []*annotation{d}
+		s.history = []*Annotation{d}
 	} else {
 		s.history = append(s.history, d)
 	}
 	return d
 }
 
-func (s *documentInfo) Version() float32 {
+//Version - Document version, in free format, should be incremented if the document is changed and re-released to the public
+func (s *DocumentInfo) Version() float32 {
 	return s.version
 }
 
-func (s *documentInfo) SetVersion(version float32) {
+//SetVersion - set document's version
+func (s *DocumentInfo) SetVersion(version float32) {
 	s.version = version
 }
 
-func (s *documentInfo) ID() uuid.UUID {
+//ID - this is a unique identifier for a document. this must not change
+func (s *DocumentInfo) ID() uuid.UUID {
 	return *s.id
 }
 
-func (s *documentInfo) SetID(id uuid.UUID) {
+//SetID - set ID
+func (s *DocumentInfo) SetID(id uuid.UUID) {
 	s.id = &id
 }
 
-func (s *documentInfo) SrcOcr() string {
+//SrcOcr - URL of the original (online) document, if this is a conversion
+func (s *DocumentInfo) SrcOcr() string {
 	return s.srcOcr
 }
 
-func (s *documentInfo) SetSrcOcr(srcOcr string) {
+//SetSrcOcr - set url of original document
+func (s *DocumentInfo) SetSrcOcr(srcOcr string) {
 	s.srcOcr = srcOcr
 }
 
-func (s *documentInfo) SrcUrls() []string {
+//SrcUrls - Source URL if this document is a conversion of some other (online) document
+func (s *DocumentInfo) SrcUrls() []string {
 	return s.srcUrls
 }
 
-func (s *documentInfo) AddSrcURL(url string) {
+//AddSrcURL - add new src url to list
+func (s *DocumentInfo) AddSrcURL(url string) {
 	if s.srcUrls == nil {
 		s.srcUrls = []string{url}
 	} else {
@@ -105,42 +118,50 @@ func (s *documentInfo) AddSrcURL(url string) {
 	}
 }
 
-func (s *documentInfo) SetDate(dt time.Time) {
-	d := date(dt)
+//SetDate - set date this document was created
+func (s *DocumentInfo) SetDate(dt time.Time) {
+	d := Date(dt)
 	s.date = &d
 }
 
-func (s *documentInfo) Date() *date {
+//Date - Date this document was created, same guidelines as in the title-info; section apply
+func (s *DocumentInfo) Date() *Date {
 	return s.date
 }
 
-func (s *documentInfo) ProgramUsed() string {
+//ProgramUsed - Any software used in preparation of this document, in free format
+func (s *DocumentInfo) ProgramUsed() string {
 	return s.programUsed
 }
 
-func (s *documentInfo) SetProgramUsed(programUsed string) {
+//SetProgramUsed - set name of software used for creating of this document
+func (s *DocumentInfo) SetProgramUsed(programUsed string) {
 	s.programUsed = programUsed
 }
 
-func (s *documentInfo) Authors() []*author {
+//Authors - Author(s) of this particular document
+func (s *DocumentInfo) Authors() []*Author {
 	return s.authors
 }
 
-func (s *documentInfo) CreateAuthor() *author {
-	a := &author{}
+//CreateAuthor - create new Author, add it to list of authors and return
+func (s *DocumentInfo) CreateAuthor() *Author {
+	a := &Author{}
 	s.AddAuthor(a)
 	return a
 }
 
-func (s *documentInfo) AddAuthor(docAuthor *author) {
+//AddAuthor - add existing Author to list of authors
+func (s *DocumentInfo) AddAuthor(docAuthor *Author) {
 	if s.authors == nil {
-		s.authors = []*author{docAuthor}
+		s.authors = []*Author{docAuthor}
 	} else {
 		s.authors = append(s.authors, docAuthor)
 	}
 }
 
-func (s *documentInfo) ToXML() (string, error) {
+//ToXML - export to XML string
+func (s *DocumentInfo) ToXML() (string, error) {
 	b := s.builder()
 	b.Reset()
 	b.openTag(s.tag())
@@ -171,7 +192,7 @@ func (s *documentInfo) ToXML() (string, error) {
 	return b.String(), nil
 }
 
-func (s *documentInfo) serializePublisher() error {
+func (s *DocumentInfo) serializePublisher() error {
 	if s.publishers != nil {
 		for _, h := range s.publishers {
 			str, err := h.ToXML()
@@ -184,7 +205,7 @@ func (s *documentInfo) serializePublisher() error {
 	return nil
 }
 
-func (s *documentInfo) serializeHistory() error {
+func (s *DocumentInfo) serializeHistory() error {
 	if s.history != nil {
 		for _, h := range s.history {
 			str, err := h.ToXML()
@@ -197,7 +218,7 @@ func (s *documentInfo) serializeHistory() error {
 	return nil
 }
 
-func (s *documentInfo) serializeID() {
+func (s *DocumentInfo) serializeID() {
 	if s.id == nil {
 		u := uuid.NewV4()
 		s.id = &u
@@ -205,7 +226,7 @@ func (s *documentInfo) serializeID() {
 	s.builder().makeTag("id", s.id.String())
 }
 
-func (s *documentInfo) serializeSrcUrls() error {
+func (s *DocumentInfo) serializeSrcUrls() error {
 	if s.srcUrls != nil {
 		for _, url := range s.srcUrls {
 			s.builder().makeTag("src-url", sanitizeString(url))
@@ -214,7 +235,7 @@ func (s *documentInfo) serializeSrcUrls() error {
 	return nil
 }
 
-func (s *documentInfo) serializeDate() error {
+func (s *DocumentInfo) serializeDate() error {
 	if s.date == nil {
 		s.SetDate(time.Now())
 	}
@@ -226,7 +247,7 @@ func (s *documentInfo) serializeDate() error {
 	return nil
 }
 
-func (s *documentInfo) serializeAuthors() error {
+func (s *DocumentInfo) serializeAuthors() error {
 	if s.authors == nil || len(s.authors) == 0 {
 		return makeError(ErrEmptyField, "Empty required %s/author", s.tag())
 	}
@@ -240,6 +261,6 @@ func (s *documentInfo) serializeAuthors() error {
 	return nil
 }
 
-func (s *documentInfo) tag() string {
+func (s *DocumentInfo) tag() string {
 	return "document-info"
 }
