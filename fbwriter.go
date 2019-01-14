@@ -132,7 +132,7 @@ func prepareSection(str string) []string { //nolint:gocyclo
 			return "</p>"
 		}
 		for _, t := range goodTags {
-			if !strings.HasPrefix(s, "<"+t) || strings.HasPrefix(s, "</"+t) {
+			if strings.HasPrefix(s, "<"+t) || strings.HasPrefix(s, "</"+t) {
 				if ok, _ := regexp.MatchString("^</?(image|a)", s); ok {
 					return s
 				}
