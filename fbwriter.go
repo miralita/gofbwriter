@@ -8,7 +8,11 @@ import (
 
 //NewBook - creates new empty book
 func NewBook() *Fb2 { // nolint: golint
-	return &Fb2{}
+	bk := &Fb2{}
+	bk.CreateDescription().CreatePublishInfo()
+	bk.CreateBody()
+
+	return bk
 }
 
 type builder struct {
@@ -103,6 +107,52 @@ func sanitizeString(str string) string {
 		str = strings.Replace(str, k, v, -1)
 	}
 	return str
+}
+
+func prepareSection(str string) []string { //nolint:gocyclo
+	re := regexp.MustCompile(`<(/?[A-z0-9-]+).*?>`)
+	//str = re.ReplaceAllString(str, "<$1>")
+	inCode := false
+	str = re.ReplaceAllStringFunc(str, func(s string) string {
+		goodTags := []string{"b", "i", "strong", "del", "em", "pre", "small", "sub", "sup", "u", "strikethrough", "emphasis", "p"}
+		if inCode {
+			if strings.HasPrefix(s, "</code") {
+				inCode = false
+			}
+			return s
+		}
+		if strings.HasPrefix(s, "<code") {
+			inCode = true
+			return s
+		}
+		if strings.HasPrefix(s, "<div") {
+			return "<p>"
+		}
+		if strings.HasPrefix(s, "</div") {
+			return "</p>"
+		}
+		for _, t := range goodTags {
+			if !strings.HasPrefix(s, "<"+t) || strings.HasPrefix(s, "</"+t) {
+				if ok, _ := regexp.MatchString("^</?(image|a)", s); ok {
+					return s
+				}
+				if strings.HasPrefix(s, "</") {
+					return "</" + t + ">"
+				}
+				return "<" + t + ">"
+
+			}
+		}
+		return ""
+	})
+	re = regexp.MustCompile("[[:space:]]*</?p>[[:space:]]*")
+	ret := []string{}
+	for _, s := range re.Split(str, -1) {
+		if s != "" {
+			ret = append(ret, s)
+		}
+	}
+	return ret
 }
 
 func (b *builder) makeAttribute(attrName, attrValue string) *builder {

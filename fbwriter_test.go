@@ -29,7 +29,7 @@ func TestNewBook(t *testing.T) {
 	titleInfo.AddGenre(gofbwriter.GenreAdventure)
 	titleInfo.CreateAuthor("Иван", "Иванович", "Иванов")
 	titleInfo.SetBookTitle("Тестовая книга")
-	titleInfo.SetLang("russian")
+	titleInfo.SetLang("ru")
 
 	docInfo := descr.CreateDocumentInfo()
 	docInfo.CreateAuthor().AddNickname("miralita")

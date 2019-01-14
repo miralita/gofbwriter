@@ -145,6 +145,70 @@ func (s *Fb2) makeBinary() error {
 	return nil
 }
 
+//SetTitle - save book's title
+func (s *Fb2) SetTitle(title string) *Fb2 {
+	s.titleInfo().SetBookTitle(title)
+	return s
+}
+
+func (s *Fb2) titleInfo() *TitleInfo {
+	descr := s.Description()
+	if descr == nil {
+		descr = s.CreateDescription()
+		descr.CreatePublishInfo()
+	}
+	titleInfo := descr.TitleInfo()
+	if titleInfo == nil {
+		titleInfo = descr.CreateTitleInfo()
+	}
+	return titleInfo
+}
+
+//SetLang - set book language
+func (s *Fb2) SetLang(lang string) *Fb2 {
+	s.titleInfo().SetLang(lang)
+	return s
+}
+
+//SetBookAuthor - save author
+func (s *Fb2) SetBookAuthor(firstName, middleName, lastName string) *Fb2 {
+	s.titleInfo().CreateAuthor(firstName, middleName, lastName)
+	return s
+}
+
+//SetDocAuthor - save author of current document
+func (s *Fb2) SetDocAuthor(nickname string) *Fb2 {
+	descr := s.Description()
+	if descr == nil {
+		descr = s.CreateDescription()
+		descr.CreatePublishInfo()
+	}
+	docInfo := descr.DocumentInfo()
+	if docInfo == nil {
+		docInfo = descr.CreateDocumentInfo()
+	}
+	docInfo.CreateAuthor().AddNickname(nickname)
+	return s
+}
+
+//AddSection - add entire text block with title to book
+func (s *Fb2) AddSection(title, body string) (*Section, error) {
+	bd := s.Body()
+	if bd == nil {
+		bd = s.CreateBody()
+	}
+	sec := bd.CreateSection()
+	if title != "" {
+		t := sec.CreateTitle()
+		t.AddParagraph(title)
+	}
+	data := prepareSection(body)
+	for _, str := range data {
+		sec.AddParagraph(str)
+	}
+	return sec, nil
+}
+
 func (s *Fb2) makeNotes() error {
 	if s.notes != nil && len(s.notes) > 0 {
 		for _, n := range s.notes {
