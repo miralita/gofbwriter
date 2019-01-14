@@ -209,6 +209,11 @@ func (s *Fb2) AddSection(title, body string) (*Section, error) {
 	return sec, nil
 }
 
+//SetGenre - save book's genre
+func (s *Fb2) SetGenre(genre Genre) {
+	s.titleInfo().AddGenre(genre)
+}
+
 func (s *Fb2) makeNotes() error {
 	if s.notes != nil && len(s.notes) > 0 {
 		for _, n := range s.notes {
