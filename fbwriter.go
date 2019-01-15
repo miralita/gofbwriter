@@ -111,39 +111,64 @@ func sanitizeString(str string) string {
 
 func prepareSection(str string) []string { //nolint:gocyclo
 	re := regexp.MustCompile(`<(/?[A-z0-9-]+).*?>`)
+	re1 := regexp.MustCompile(`<(/?)([A-z0-9-]+)`)
 	//str = re.ReplaceAllString(str, "<$1>")
 	inCode := false
+	st := newStack()
 	str = re.ReplaceAllStringFunc(str, func(s string) string {
-		goodTags := []string{"b", "i", "strong", "del", "em", "pre", "small", "sub", "sup", "u", "strikethrough", "emphasis", "p"}
+		goodTags := []string{"p", "b", "i", "strong", "del", "em", "pre", "small", "sub", "sup", "u", "strikethrough", "emphasis"}
+		val := re1.FindStringSubmatch(s)
+		if len(val) < 3 {
+			// Tag not found? Strange...
+			return ""
+		}
+		tag := strings.ToLower(val[2])
+		isOpen := (val[1] == "")
+		trimAttrs := true
+		tagOk := true
 		if inCode {
-			if strings.HasPrefix(s, "</code") {
+			if !isOpen && tag == "code" {
 				inCode = false
 			}
-			return s
-		}
-		if strings.HasPrefix(s, "<code") {
+		} else if isOpen && tag == "code" {
 			inCode = true
-			return s
-		}
-		if strings.HasPrefix(s, "<div") {
-			return "<p>"
-		}
-		if strings.HasPrefix(s, "</div") {
-			return "</p>"
-		}
-		for _, t := range goodTags {
-			if strings.HasPrefix(s, "<"+t) || strings.HasPrefix(s, "</"+t) {
-				if ok, _ := regexp.MatchString("^</?(image|a)", s); ok {
-					return s
+		} else if tag == "div" {
+			tag = "p"
+		} else if tag == "a" || tag == "image" { //nolint:goconst
+			trimAttrs = false
+		} else {
+			tagOk = false
+			for _, t := range goodTags {
+				if t == tag {
+					tagOk = true
+					break
 				}
-				if strings.HasPrefix(s, "</") {
-					return "</" + t + ">"
-				}
-				return "<" + t + ">"
-
 			}
 		}
-		return ""
+		if !tagOk {
+			return ""
+		}
+		if isOpen {
+			st.push(tag)
+			if trimAttrs {
+				return "<" + tag + ">"
+			}
+			return s
+		}
+		appendStr := ""
+		if st.peek() != tag {
+			// close all open nested tags
+			for st.peek() != "" && st.peek() != tag {
+				currentTag := st.pop()
+				appendStr += "</" + currentTag + ">"
+			}
+		}
+		st.pop()
+		if trimAttrs {
+			return appendStr + "</" + tag + ">"
+		}
+		return appendStr + s
+
 	})
 	re = regexp.MustCompile("[[:space:]]*</?p>[[:space:]]*")
 	ret := []string{}

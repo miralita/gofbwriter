@@ -76,9 +76,9 @@ func (i *Image) ToXML() (string, error) {
 }
 
 func (i *InlineImage) tag() string {
-	return "image"
+	return "image" //nolint:goconst
 }
 
 func (i *Image) tag() string {
-	return "image"
+	return "image" //nolint:goconst
 }
